@@ -1,1456 +1,1340 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Dokter Kecil</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            nunito: ['Nunito', 'sans-serif'],
-            baloo: ['Baloo 2', 'cursive'],
-          },
-          colors: {
-            sky: { DEFAULT: '#38BDF8', dark: '#0EA5E9' },
-            mint: { DEFAULT: '#2DD4BF', dark: '#0D9488' },
-            rose: '#FB7185',
-            ink: '#0F172A',
-            muted: '#64748B',
-          },
-          borderRadius: {
-            md: '10px',
-            lg: '16px',
-            xl: '22px',
-          },
-          keyframes: {
-            fadeUp: { from: { opacity: '0', transform: 'translateY(18px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
-            scaleIn: { from: { opacity: '0', transform: 'scale(.92)' }, to: { opacity: '1', transform: 'scale(1)' } },
-            floatY: { '0%,100%': { transform: 'translateY(0) rotate(-3deg)' }, '50%': { transform: 'translateY(-10px) rotate(3deg)' } },
-            spinX: { to: { transform: 'rotate(360deg)' } },
-            dotP: { '0%,80%,100%': { transform: 'scale(0)', opacity: '.4' }, '40%': { transform: 'scale(1)', opacity: '1' } },
-            slideR: { from: { opacity: '0', transform: 'translateX(-16px)' }, to: { opacity: '1', transform: 'translateX(0)' } },
-            slideL: { from: { opacity: '0', transform: 'translateX(16px)' }, to: { opacity: '1', transform: 'translateX(0)' } },
-            shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
-          },
-          animation: {
-            fadeUp: 'fadeUp .42s cubic-bezier(.4,0,.2,1) both',
-            scaleIn: 'scaleIn .48s ease both',
-            float: 'floatY 3.2s ease-in-out infinite',
-            spinX: 'spinX .7s linear infinite',
-            dotP: 'dotP 1.4s ease-in-out infinite',
-            slideR: 'slideR .28s ease both',
-            slideL: 'slideL .28s ease both',
-          },
+          fontFamily: { nunito: ['Nunito', 'sans-serif'], baloo: ['Baloo 2', 'cursive'] },
+          colors: { sky: { DEFAULT: '#38BDF8', dark: '#0EA5E9' }, mint: { DEFAULT: '#2DD4BF', dark: '#0D9488' }, rose: '#FB7185', ink: '#0F172A', muted: '#64748B' },
+          borderRadius: { md: '10px', lg: '16px', xl: '22px' },
         }
       }
     }
   </script>
   <style>
-    /* minimal overrides Tailwind can't do inline */
-    body {
-      font-family: 'Nunito', sans-serif;
-      background:
-        radial-gradient(ellipse 160% 90% at 0% 0%, #BAE6FD80 0%, transparent 55%),
-        radial-gradient(ellipse 120% 70% at 100% 0%, #FDE68A70 0%, transparent 50%),
-        radial-gradient(ellipse 90% 80% at 5% 90%, #C4B5FD50 0%, transparent 50%),
-        radial-gradient(ellipse 100% 60% at 95% 95%, #BBF7D060 0%, transparent 45%),
-        #F0F9FF;
-      min-height: 100vh;
-    }
+    body { font-family: 'Nunito', sans-serif; background: radial-gradient(ellipse 160% 90% at 0% 0%, #BAE6FD80 0%, transparent 55%), radial-gradient(ellipse 120% 70% at 100% 0%, #FDE68A70 0%, transparent 50%), radial-gradient(ellipse 90% 80% at 5% 90%, #C4B5FD50 0%, transparent 50%), radial-gradient(ellipse 100% 60% at 95% 95%, #BBF7D060 0%, transparent 45%), #F0F9FF; min-height: 100vh; }
+    .screen { display: none }
+    .screen.active { display: block; animation: fadeUp .42s cubic-bezier(.4,0,.2,1) both }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(18px) } to { opacity:1; transform:translateY(0) } }
+    @keyframes scaleIn { from { opacity:0; transform:scale(.92) } to { opacity:1; transform:scale(1) } }
+    @keyframes floatY { 0%,100% { transform:translateY(0) rotate(-3deg) } 50% { transform:translateY(-10px) rotate(3deg) } }
+    @keyframes spinX { to { transform:rotate(360deg) } }
+    @keyframes dotP { 0%,80%,100% { transform:scale(0); opacity:.4 } 40% { transform:scale(1); opacity:1 } }
+    @keyframes slideR { from { opacity:0; transform:translateX(-16px) } to { opacity:1; transform:translateX(0) } }
+    @keyframes slideL { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }
+    @keyframes pulse-dot { 0%,100% { opacity:.4; transform:scale(.8) } 50% { opacity:1; transform:scale(1.1) } }
+    @keyframes shimmer-msg { 0% { background-position: -200% 0 } 100% { background-position: 200% 0 } }
+    @keyframes bounce-in { 0% { transform:scale(0.5) translateY(10px); opacity:0 } 70% { transform:scale(1.05) translateY(-2px) } 100% { transform:scale(1) translateY(0); opacity:1 } }
+    @keyframes wave { 0%,100% { transform: rotate(0deg) } 25% { transform: rotate(-10deg) } 75% { transform: rotate(10deg) } }
+    .anim-float { animation: floatY 3.2s ease-in-out infinite }
+    .anim-spin { animation: spinX .7s linear infinite }
+    .anim-fadeup { animation: fadeUp .42s cubic-bezier(.4,0,.2,1) both }
+    .anim-scalein { animation: scaleIn .48s ease both }
+    .anim-slider { animation: slideR .28s ease both }
+    .anim-slidel { animation: slideL .28s ease both }
+    .anim-bouncein { animation: bounce-in .4s cubic-bezier(.34,1.56,.64,1) both }
+    .anim-wave { animation: wave .5s ease-in-out }
+    .d1{animation-delay:.05s} .d2{animation-delay:.1s} .d3{animation-delay:.15s} .d4{animation-delay:.2s} .d5{animation-delay:.25s} .d6{animation-delay:.3s}
+    .dd-wrap { position: relative }
+    .dd-panel { position:absolute; top:calc(100% + 5px); left:0; right:0; background:white; border:1.5px solid #E2E8F0; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06); z-index:100; overflow:hidden; transform-origin:top center; transform:scaleY(.85) translateY(-4px); opacity:0; pointer-events:none; transition:transform .2s cubic-bezier(.4,0,.2,1),opacity .16s ease; min-width:100% }
+    .dd-panel.up { top:auto; bottom:calc(100% + 5px); transform-origin:bottom center; transform:scaleY(.85) translateY(4px) }
+    .dd-panel.open { transform:scaleY(1) translateY(0) !important; opacity:1; pointer-events:all }
+    .tdot { width:6px; height:6px; border-radius:50%; background:#94A3B8; animation:dotP 1.4s ease-in-out infinite }
+    .tdot:nth-child(2) { animation-delay:.2s } .tdot:nth-child(3) { animation-delay:.4s }
+    .card-sym { overflow: visible !important }
+    .bar-fill { width:0; transition:width 1.1s cubic-bezier(.4,0,.2,1) }
+    #chat-msgs { scrollbar-width:thin; scrollbar-color:#E2E8F0 transparent }
+    #chat-msgs::-webkit-scrollbar { width:3px }
+    #chat-msgs::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:99px }
+    .grad-text { background:linear-gradient(135deg,#0EA5E9,#14B8A6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text }
+    .form-locked { pointer-events:none; opacity:.5; user-select:none }
 
-    /* Screen transitions */
-    .screen {
-      display: none
-    }
+    /* Chat enhancements */
+    .chat-bubble-bot { background: white; border: 1.5px solid #E2E8F0; border-radius: 18px 18px 18px 4px; }
+    .chat-bubble-user { background: linear-gradient(135deg, #38BDF8, #2DD4BF); border-radius: 18px 18px 4px 18px; color: white; }
+    .chat-bubble-system { background: linear-gradient(135deg, #F0FDF4, #ECFDF5); border: 1.5px solid #A7F3D0; border-radius: 14px; }
+    .chat-bubble-warning { background: linear-gradient(135deg, #FFF7ED, #FFFBEB); border: 1.5px solid #FED7AA; border-radius: 14px; }
 
-    .screen.active {
-      display: block;
-      animation: fadeUp .42s cubic-bezier(.4, 0, .2, 1) both
-    }
+    /* Mood indicator */
+    .mood-calm { background: #ECFDF5; color: #065F46 }
+    .mood-worried { background: #FFF7ED; color: #92400E }
+    .mood-urgent { background: #FEF2F2; color: #991B1B }
+    .mood-happy { background: #F0F9FF; color: #0C4A6E }
 
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(18px)
-      }
+    /* Quick reply buttons */
+    .quick-reply { border: 1.5px solid #E2E8F0; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; background: white; color: #64748B; white-space: nowrap; }
+    .quick-reply:hover { border-color: #38BDF8; color: #0F172A; background: #F0F9FF; transform: translateY(-1px); }
+    .quick-reply:active { transform: scale(.96) }
 
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
+    /* Context chip */
+    .ctx-chip { display: inline-flex; align-items: center; gap: 4px; background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 99px; padding: 3px 10px; font-size: 11px; font-weight: 700; color: #0369A1; }
 
-    @keyframes scaleIn {
-      from {
-        opacity: 0;
-        transform: scale(.92)
-      }
+    /* Emoji reaction */
+    .emoji-react { font-size: 18px; cursor: pointer; padding: 2px 5px; border-radius: 6px; transition: transform .2s; display: inline-block; }
+    .emoji-react:hover { transform: scale(1.3) }
 
-      to {
-        opacity: 1;
-        transform: scale(1)
-      }
-    }
+    /* Message timestamp */
+    .msg-time { font-size: 10px; color: #94A3B8; font-weight: 600; }
 
-    @keyframes floatY {
+    /* Suggestion card */
+    .sugg-card { background: white; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 10px 14px; cursor: pointer; transition: all .2s; text-align: left; }
+    .sugg-card:hover { border-color: #38BDF8; box-shadow: 0 4px 12px rgba(56,189,248,.12); transform: translateY(-2px); }
 
-      0%,
-      100% {
-        transform: translateY(0) rotate(-3deg)
-      }
+    /* Typing shimmer */
+    .shimmer-text { background: linear-gradient(90deg, #94A3B8 25%, #CBD5E1 50%, #94A3B8 75%); background-size: 200% auto; animation: shimmer-msg 1.5s linear infinite; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-      50% {
-        transform: translateY(-10px) rotate(3deg)
-      }
-    }
+    /* Knowledge card */
+    .know-card { background: linear-gradient(135deg, #F0F9FF, #F0FDF4); border: 1px solid #BAE6FD; border-radius: 14px; overflow: hidden; }
+    .know-card-header { background: linear-gradient(135deg, #38BDF8, #2DD4BF); color: white; padding: 10px 14px; font-weight: 800; font-size: 13px; }
 
-    @keyframes spinX {
-      to {
-        transform: rotate(360deg)
-      }
-    }
+    /* Status bar */
+    .status-online { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #059669; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #10B981; animation: pulse-dot 2s ease-in-out infinite; }
 
-    @keyframes dotP {
-
-      0%,
-      80%,
-      100% {
-        transform: scale(0);
-        opacity: .4
-      }
-
-      40% {
-        transform: scale(1);
-        opacity: 1
-      }
-    }
-
-    @keyframes slideR {
-      from {
-        opacity: 0;
-        transform: translateX(-16px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateX(0)
-      }
-    }
-
-    @keyframes slideL {
-      from {
-        opacity: 0;
-        transform: translateX(16px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateX(0)
-      }
-    }
-
-    @keyframes barGrow {
-      from {
-        width: 0
-      }
-
-      to {
-        width: var(--tw)
-      }
-    }
-
-    .anim-float {
-      animation: floatY 3.2s ease-in-out infinite
-    }
-
-    .anim-spin {
-      animation: spinX .7s linear infinite
-    }
-
-    .anim-fadeup {
-      animation: fadeUp .42s cubic-bezier(.4, 0, .2, 1) both
-    }
-
-    .anim-scalein {
-      animation: scaleIn .48s ease both
-    }
-
-    .anim-slider {
-      animation: slideR .28s ease both
-    }
-
-    .anim-slidel {
-      animation: slideL .28s ease both
-    }
-
-    /* Stagger delays */
-    .d1 {
-      animation-delay: .05s
-    }
-
-    .d2 {
-      animation-delay: .1s
-    }
-
-    .d3 {
-      animation-delay: .15s
-    }
-
-    .d4 {
-      animation-delay: .2s
-    }
-
-    .d5 {
-      animation-delay: .25s
-    }
-
-    .d6 {
-      animation-delay: .3s
-    }
-
-    /* ─── DROPDOWN: position:absolute inside .dd-wrap ─── */
-    .dd-wrap {
-      position: relative;
-    }
-
-    .dd-panel {
-      position: absolute;
-      top: calc(100% + 5px);
-      left: 0;
-      right: 0;
-      background: white;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 14px;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, .12), 0 2px 8px rgba(0, 0, 0, .06);
-      z-index: 100;
-      overflow: hidden;
-      transform-origin: top center;
-      transform: scaleY(.85) translateY(-4px);
-      opacity: 0;
-      pointer-events: none;
-      transition: transform .2s cubic-bezier(.4, 0, .2, 1), opacity .16s ease;
-      min-width: 100%;
-    }
-
-    .dd-panel.up {
-      top: auto;
-      bottom: calc(100% + 5px);
-      transform-origin: bottom center;
-      transform: scaleY(.85) translateY(4px);
-    }
-
-    .dd-panel.open {
-      transform: scaleY(1) translateY(0) !important;
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    /* Typing dots */
-    .tdot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #94A3B8;
-      animation: dotP 1.4s ease-in-out infinite
-    }
-
-    .tdot:nth-child(2) {
-      animation-delay: .2s
-    }
-
-    .tdot:nth-child(3) {
-      animation-delay: .4s
-    }
-
-
-    /* Cards containing dropdowns must not clip */
-    .card-sym {
-      overflow: visible !important;
-    }
-
-    /* Bar fill animate */
-    .bar-fill {
-      width: 0;
-      transition: width 1.1s cubic-bezier(.4, 0, .2, 1)
-    }
-
-    /* Chat scroll */
-    #chat-msgs {
-      scrollbar-width: thin;
-      scrollbar-color: #E2E8F0 transparent
-    }
-
-    #chat-msgs::-webkit-scrollbar {
-      width: 3px
-    }
-
-    #chat-msgs::-webkit-scrollbar-thumb {
-      background: #CBD5E1;
-      border-radius: 99px
-    }
-
-    /* Gradient text */
-    .grad-text {
-      background: linear-gradient(135deg, #0EA5E9, #14B8A6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* Disabled overlay for form */
-    .form-locked {
-      pointer-events: none;
-      opacity: .5;
-      user-select: none
-    }
+    /* Chat topic badge */
+    .topic-badge { display: inline-flex; align-items: center; gap: 4px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 99px; padding: 2px 10px; font-size: 11px; font-weight: 800; color: #1D4ED8; }
   </style>
 </head>
-
 <body class="text-ink">
 
-  <!-- ── Floating BG emojis ── -->
-  <div class="fixed inset-0 pointer-events-none overflow-hidden" style="z-index:0">
-    <span class="absolute text-3xl opacity-10 anim-float" style="top:6%;left:4%">🌟</span>
-    <span class="absolute text-3xl opacity-10 anim-float" style="top:14%;right:6%;animation-delay:.9s">💊</span>
-    <span class="absolute text-3xl opacity-10 anim-float" style="top:52%;left:2%;animation-delay:1.6s">🩺</span>
-    <span class="absolute text-3xl opacity-10 anim-float" style="top:68%;right:4%;animation-delay:.3s">🌈</span>
-    <span class="absolute text-3xl opacity-10 anim-float" style="top:84%;left:10%;animation-delay:2.1s">⭐</span>
-  </div>
+<!-- Floating BG emojis -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden" style="z-index:0">
+  <span class="absolute text-3xl opacity-10 anim-float" style="top:6%;left:4%">🌟</span>
+  <span class="absolute text-3xl opacity-10 anim-float" style="top:14%;right:6%;animation-delay:.9s">💊</span>
+  <span class="absolute text-3xl opacity-10 anim-float" style="top:52%;left:2%;animation-delay:1.6s">🩺</span>
+  <span class="absolute text-3xl opacity-10 anim-float" style="top:68%;right:4%;animation-delay:.3s">🌈</span>
+  <span class="absolute text-3xl opacity-10 anim-float" style="top:84%;left:10%;animation-delay:2.1s">⭐</span>
+</div>
 
-  <!-- ── App wrapper ── -->
-  <div class="relative z-10 w-full max-w-full p-6 sm:p-8">
-    <div class="max-w-xl mx-auto">
+<div class="relative z-10 w-full max-w-full p-6 sm:p-8">
+  <div class="max-w-xl mx-auto">
 
-      <!-- ════════════════════════════════════
-     TRAIN GATE BANNER (shown when no model)
-════════════════════════════════════ -->
-      <div id="train-gate" class="hidden mb-6 anim-fadeup">
-        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3 items-start">
-          <span class="text-2xl flex-shrink-0">⚙️</span>
-          <div class="flex-1">
-            <p class="font-extrabold text-amber-800 text-sm mb-1" id="gate-title">Model belum dilatih</p>
-            <p class="text-amber-700 text-xs font-semibold mb-3" id="gate-desc">Upload <code
-                class="bg-amber-100 px-1 rounded">disease_data.csv</code> ke folder server, lalu klik tombol di bawah
-              untuk melatih model Naive Bayes dari 8.000 data penyakit.</p>
-            <div class="flex gap-2 flex-wrap">
-              <button onclick="trainModel()" id="btn-train"
-                class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-extrabold text-xs px-4 py-2 rounded-md transition-all">
-                <span id="train-icon">🚀</span><span id="train-txt">Latih Model Sekarang</span>
-              </button>
-              <button onclick="dismissGate()"
-                class="text-xs font-bold text-amber-600 hover:text-amber-800 px-3 py-2 rounded-md hover:bg-amber-100 transition-colors"
-                id="gate-skip">
-                Lanjut tanpa CSV (demo)
-              </button>
-            </div>
+    <!-- Train Gate Banner -->
+    <div id="train-gate" class="hidden mb-6 anim-fadeup">
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3 items-start">
+        <span class="text-2xl flex-shrink-0">⚙️</span>
+        <div class="flex-1">
+          <p class="font-extrabold text-amber-800 text-sm mb-1" id="gate-title">Model belum dilatih</p>
+          <p class="text-amber-700 text-xs font-semibold mb-3" id="gate-desc">Upload <code class="bg-amber-100 px-1 rounded">disease_data.csv</code> ke folder server, lalu klik tombol di bawah.</p>
+          <div class="flex gap-2 flex-wrap">
+            <button onclick="trainModel()" id="btn-train" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-extrabold text-xs px-4 py-2 rounded-md transition-all">
+              <span id="train-icon">🚀</span><span id="train-txt">Latih Model Sekarang</span>
+            </button>
+            <button onclick="dismissGate()" class="text-xs font-bold text-amber-600 hover:text-amber-800 px-3 py-2 rounded-md hover:bg-amber-100 transition-colors" id="gate-skip">Lanjut tanpa CSV (demo)</button>
           </div>
         </div>
       </div>
-
-      <!-- ════════════════════════════════════
-     SCREEN 1 — LANGUAGE
-════════════════════════════════════ -->
-      <div id="s-lang" class="screen active">
-        <div class="text-center mb-8 anim-scalein">
-          <div class="inline-block text-6xl mb-3 anim-float">🩺</div>
-          <h1 class="font-baloo font-extrabold grad-text" style="font-size:clamp(2rem,6vw,3rem);line-height:1.1">Dokter
-            Kecil</h1>
-          <p class="text-muted font-bold text-sm mt-2">Asisten kesehatan pintar untuk anak-anak 🌟</p>
-        </div>
-
-        <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 anim-fadeup d1">
-          <p class="text-xs font-black text-muted text-center tracking-widest uppercase mb-4">Pilih Bahasa / Select
-            Language</p>
-          <div class="flex flex-col gap-3">
-            <button id="lc-id" onclick="pickLang('id')"
-              class="lang-card flex items-center gap-4 p-4 rounded-lg border-2 border-slate-200 bg-white text-left cursor-pointer transition-all hover:-translate-y-0.5 hover:border-sky hover:shadow-md active:scale-97">
-              <span class="text-3xl">🇮🇩</span>
-              <div>
-                <div class="font-black text-base text-ink">Bahasa Indonesia</div>
-                <div class="text-xs text-muted font-semibold">Lanjut dalam bahasa Indonesia</div>
-              </div>
-              <span id="ck-id" class="ml-auto text-mint text-xl transition-opacity opacity-0">✓</span>
-            </button>
-            <button id="lc-en" onclick="pickLang('en')"
-              class="lang-card flex items-center gap-4 p-4 rounded-lg border-2 border-slate-200 bg-white text-left cursor-pointer transition-all hover:-translate-y-0.5 hover:border-sky hover:shadow-md active:scale-97">
-              <span class="text-3xl">🇺🇸</span>
-              <div>
-                <div class="font-black text-base text-ink">English</div>
-                <div class="text-xs text-muted font-semibold">Continue in English</div>
-              </div>
-              <span id="ck-en" class="ml-auto text-mint text-xl transition-opacity opacity-0">✓</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ════════════════════════════════════
-     SCREEN 2 — PROFILE
-════════════════════════════════════ -->
-      <div id="s-profile" class="screen">
-        <!-- Step indicator -->
-        <div class="flex items-center justify-center gap-0 mb-6">
-          <div id="st1"
-            class="w-8 h-8 rounded-full bg-mint border-2 border-mint text-white flex items-center justify-center text-xs font-black flex-shrink-0 transition-all">
-            ✓</div>
-          <div id="sl1" class="h-0.5 w-9 bg-mint transition-all"></div>
-          <div id="st2"
-            class="w-8 h-8 rounded-full border-2 border-sky bg-gradient-to-br from-sky to-mint text-white flex items-center justify-center text-xs font-black flex-shrink-0 shadow-sm">
-            2</div>
-          <div id="sl2" class="h-0.5 w-9 bg-slate-200 transition-all"></div>
-          <div id="st3"
-            class="w-8 h-8 rounded-full border-2 border-slate-200 bg-white text-muted flex items-center justify-center text-xs font-black flex-shrink-0">
-            3</div>
-          <div class="h-0.5 w-9 bg-slate-200"></div>
-          <div
-            class="w-8 h-8 rounded-full border-2 border-slate-200 bg-white text-muted flex items-center justify-center text-xs font-black flex-shrink-0">
-            4</div>
-        </div>
-
-        <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 sm:p-7">
-          <div class="mb-5">
-            <div class="text-4xl mb-2">👦</div>
-            <h2 class="font-baloo font-bold text-xl text-ink" id="p-title">Siapa yang sakit?</h2>
-            <p class="text-sm text-muted font-semibold mt-1" id="p-sub">Masukkan nama dan umur pasien kecil</p>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-xs font-black text-muted tracking-widest uppercase mb-2" id="p-name-lbl">Nama
-              Anak</label>
-            <input id="inp-name"
-              class="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-md font-bold text-sm text-ink bg-white outline-none focus:border-mint focus:ring-2 focus:ring-mint/15 transition-all placeholder:text-slate-300"
-              type="text" placeholder="Contoh: Budi, Sari..." maxlength="40"
-              onkeydown="if(event.key==='Enter')submitProfile()" />
-          </div>
-
-          <div class="mb-6">
-            <label class="block text-xs font-black text-muted tracking-widest uppercase mb-2"
-              id="p-age-lbl">Umur</label>
-            <!-- Age stepper: flex with explicit widths so + never disappears on mobile -->
-            <div class="flex items-center border-[1.5px] border-slate-200 rounded-md bg-white overflow-hidden">
-              <button type="button" onclick="chAge(-1)"
-                class="flex-shrink-0 w-12 h-12 flex items-center justify-center text-xl font-bold text-muted hover:bg-sky-50 hover:text-sky active:bg-sky-100 transition-colors border-r border-slate-200">
-                −
-              </button>
-              <div class="flex-1 flex items-center justify-center gap-2">
-                <span id="inp-age" class="font-baloo font-extrabold text-2xl text-ink select-none">5</span>
-                <span id="p-years" class="text-xs font-bold text-muted">tahun</span>
-              </div>
-              <button type="button" onclick="chAge(1)"
-                class="flex-shrink-0 w-12 h-12 flex items-center justify-center text-xl font-bold text-muted hover:bg-sky-50 hover:text-sky active:bg-sky-100 transition-colors border-l border-slate-200">
-                +
-              </button>
-            </div>
-          </div>
-
-          <div class="flex gap-3">
-            <button type="button" onclick="go('s-lang')"
-              class="flex-shrink-0 inline-flex items-center gap-1 px-4 py-3 rounded-md border-[1.5px] border-slate-200 text-muted font-extrabold text-sm hover:border-sky hover:text-ink hover:bg-sky-50 active:scale-95 transition-all">
-              ← <span id="p-back">Kembali</span>
-            </button>
-            <button type="button" onclick="submitProfile()"
-              class="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-md bg-gradient-to-r from-sky to-mint text-white font-extrabold text-sm shadow-[0_4px_18px_rgba(56,189,248,.3)] hover:-translate-y-0.5 hover:shadow-[0_8px_26px_rgba(56,189,248,.38)] active:scale-95 transition-all">
-              <span id="p-btn">Lanjut →</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ════════════════════════════════════
-     SCREEN 3 — SYMPTOMS
-════════════════════════════════════ -->
-      <div id="s-sym" class="screen">
-
-        <!-- Welcome banner -->
-        <div class="rounded-xl p-5 mb-5 bg-gradient-to-r from-sky-100 to-teal-50 border border-sky-200 anim-fadeup">
-          <div class="flex items-center gap-3">
-            <span class="text-4xl flex-shrink-0">👋</span>
-            <div>
-              <div class="font-baloo font-bold text-teal-700 text-lg" id="w-msg">Halo!</div>
-              <div class="text-teal-600 text-sm font-semibold opacity-80 mt-0.5" id="w-sub">Ada keluhan apa hari ini?
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Progress -->
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-black text-muted tracking-widest uppercase" id="s-title">LENGKAPI GEJALA</span>
-          <span class="text-xs font-bold text-sky" id="prog-txt">0 dari 13 diisi</span>
-        </div>
-        <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden mb-5">
-          <div id="prog-bar" class="h-full bg-gradient-to-r from-sky to-mint rounded-full transition-all duration-500"
-            style="width:0%"></div>
-        </div>
-
-        <!-- FORM (locked until model ready or demo dismissed) -->
-        <div id="sym-form">
-
-          <!-- Card: Demam & Durasi -->
-          <div
-            class="card-sym bg-white border border-slate-200 rounded-lg shadow-sm p-5 mb-3 anim-fadeup d1 hover:border-slate-300 hover:shadow-md transition-all">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="text-base">🌡️</span>
-              <span class="text-xs font-black text-muted tracking-widest uppercase" id="sl-sev">Demam & Durasi</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-fever">Tingkat demam</div>
-                <div class="dd-wrap" data-key="fever">
-                  <button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky hover:shadow-[0_0_0_3px_rgba(56,189,248,.1)] focus:outline-none"
-                    onclick="ddOpen(this)">
-                    <span class="dd-lbl" id="ph-fever">Pilih</span>
-                    <svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg>
-                  </button>
-                  <div class="dd-panel" data-open="false">
-                    <button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="none" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0 transition-colors"></span><span
-                        class="tf1">Tidak ada demam</span></button>
-                    <button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="mild" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0 transition-colors"></span><span
-                        class="tf2">Ringan ≤38°C</span></button>
-                    <button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="high" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0 transition-colors"></span><span
-                        class="tf3">Tinggi 38–39°C</span></button>
-                    <button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="severe" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0 transition-colors"></span><span
-                        class="tf4">Sangat tinggi >39°C</span></button>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-dur">Sudah berapa lama</div>
-                <div class="dd-wrap" data-key="duration">
-                  <button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky hover:shadow-[0_0_0_3px_rgba(56,189,248,.1)] focus:outline-none"
-                    onclick="ddOpen(this)">
-                    <span class="dd-lbl" id="ph-dur">Pilih</span>
-                    <svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg>
-                  </button>
-                  <div class="dd-panel" data-open="false">
-                    <button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="short" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="td1">Sebentar
-                        &lt;3 hari</span></button>
-                    <button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="long" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="td2">Lama ≥3
-                        hari</span></button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card: Pernapasan -->
-          <div
-            class="card-sym bg-white border border-slate-200 rounded-lg shadow-sm p-5 mb-3 anim-fadeup d2 hover:border-slate-300 hover:shadow-md transition-all">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="text-base">🤧</span>
-              <span class="text-xs font-black text-muted tracking-widest uppercase" id="sl-resp">Pernapasan</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <!-- Batuk -->
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-cough">Batuk</div>
-                <div class="dd-wrap" data-key="cough">
-                  <button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-              <!-- Pilek -->
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-runny">Pilek</div>
-                <div class="dd-wrap" data-key="runny_nose">
-                  <button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-              <!-- Sulit bernapas -->
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-breath">Sulit bernapas</div>
-                <div class="dd-wrap" data-key="breathing_difficulty">
-                  <button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-              <!-- Sakit tenggorokan -->
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-throat">Sakit tenggorokan</div>
-                <div class="dd-wrap" data-key="sore_throat">
-                  <button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card: Kepala & Telinga -->
-          <div
-            class="card-sym bg-white border border-slate-200 rounded-lg shadow-sm p-5 mb-3 anim-fadeup d3 hover:border-slate-300 hover:shadow-md transition-all">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="text-base">🤕</span>
-              <span class="text-xs font-black text-muted tracking-widest uppercase" id="sl-gen">Kepala & Telinga</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-head">Sakit kepala</div>
-                <div class="dd-wrap" data-key="headache"><button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-ear">Sakit telinga</div>
-                <div class="dd-wrap" data-key="ear_pain"><button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-rash">Ruam kulit</div>
-                <div class="dd-wrap" data-key="rash"><button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-appe">Nafsu makan turun</div>
-                <div class="dd-wrap" data-key="appetite_loss"><button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card: Pencernaan & Lainnya -->
-          <div
-            class="card-sym bg-white border border-slate-200 rounded-lg shadow-sm p-5 mb-3 anim-fadeup d4 hover:border-slate-300 hover:shadow-md transition-all">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="text-base">🤢</span>
-              <span class="text-xs font-black text-muted tracking-widest uppercase" id="sl-dig">Pencernaan &
-                Lainnya</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-vom">Muntah</div>
-                <div class="dd-wrap" data-key="vomiting"><button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-diar">Diare</div>
-                <div class="dd-wrap" data-key="diarrhea"><button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-              <div>
-                <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-mosq">Gigitan nyamuk</div>
-                <div class="dd-wrap" data-key="mosquito_bite"><button type="button"
-                    class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none"
-                    onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg
-                      class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg></button>
-                  <div class="dd-panel"><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Tidak" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-no">Tidak</span></button><button type="button"
-                      class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors"
-                      data-v="Ya" onclick="ddPick(this)"><span
-                        class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span
-                        class="yn-yes">Ya</span></button></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div><!-- /sym-form -->
-
-        <!-- Validation msg -->
-        <div id="v-msg"
-          class="hidden mb-3 bg-red-50 border border-red-200 rounded-md px-3.5 py-2.5 text-xs font-bold text-red-600">
-        </div>
-
-        <div class="flex gap-3 mb-2 anim-fadeup d5">
-          <button type="button" onclick="go('s-profile')"
-            class="flex-shrink-0 inline-flex items-center gap-1 px-4 py-3 rounded-md border-[1.5px] border-slate-200 text-muted font-extrabold text-sm hover:border-sky hover:text-ink hover:bg-sky-50 active:scale-95 transition-all">
-            ← <span id="s-back">Kembali</span>
-          </button>
-          <button id="btn-analyze" type="button" onclick="doAnalyze()"
-            class="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-md bg-gradient-to-r from-sky to-mint text-white font-extrabold text-sm shadow-[0_4px_18px_rgba(56,189,248,.3)] hover:-translate-y-0.5 hover:shadow-[0_8px_26px_rgba(56,189,248,.38)] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-            <span id="ba-icon">🔍</span><span id="ba-txt">Analisa Sekarang</span>
-          </button>
-        </div>
-        <p class="text-center text-xs text-slate-400 font-semibold" id="s-hint">Isi minimal 3 gejala untuk hasil terbaik
-        </p>
-      </div>
-
-      <!-- ════════════════════════════════════
-     SCREEN 4 — RESULT
-════════════════════════════════════ -->
-      <div id="s-result" class="screen">
-
-        <div class="flex items-center gap-3 mb-5">
-          <div
-            class="w-12 h-12 rounded-lg bg-gradient-to-br from-sky-100 to-teal-100 flex items-center justify-center text-2xl flex-shrink-0">
-            🧠</div>
-          <div>
-            <h2 class="font-baloo font-bold text-xl text-ink" id="r-title">Hasil Analisa</h2>
-            <p class="text-xs text-muted font-semibold" id="r-sub">Berdasarkan gejala yang dilaporkan</p>
-          </div>
-          <button type="button" onclick="go('s-sym')"
-            class="ml-auto flex-shrink-0 px-3 py-2 rounded-md border-[1.5px] border-slate-200 text-muted font-extrabold text-xs hover:border-sky hover:text-ink hover:bg-sky-50 active:scale-95 transition-all"
-            id="r-edit">
-            ✏️ Edit
-          </button>
-        </div>
-
-        <!-- Tabs -->
-        <div class="flex bg-slate-100 rounded-md p-1 gap-1 mb-5">
-          <button type="button" onclick="setTab('diag')" id="tab-diag"
-            class="tab-btn flex-1 py-2 px-3 rounded-md text-xs font-extrabold text-muted bg-white text-ink shadow-sm transition-all">
-            🩺 <span id="tab-diag-txt">Diagnosis</span>
-          </button>
-          <button type="button" onclick="setTab('chat')" id="tab-chat"
-            class="tab-btn flex-1 py-2 px-3 rounded-md text-xs font-extrabold text-muted hover:text-ink transition-all">
-            💬 <span id="tab-chat-txt">Asisten</span>
-          </button>
-        </div>
-
-        <!-- Panel: Diagnosis -->
-        <div id="panel-diag">
-          <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-5 mb-3">
-            <div id="res-items"></div>
-            <div class="mt-4 bg-amber-50 border border-amber-200 rounded-md p-3 text-xs font-semibold text-amber-800"
-              id="r-disc">
-              ⚠️ <strong>Penting:</strong> Ini bukan diagnosis medis. Segera konsultasikan dengan dokter anak.
-            </div>
-          </div>
-          <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-4 mb-4">
-            <div class="text-xs font-black text-muted tracking-widest uppercase mb-3" id="r-sym-lbl">Gejala yang
-              Dilaporkan</div>
-            <div id="sym-tags" class="flex flex-wrap gap-1.5"></div>
-          </div>
-          <div class="flex gap-3">
-            <button type="button" onclick="resetAll()"
-              class="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-md border-[1.5px] border-slate-200 text-muted font-extrabold text-sm hover:border-sky hover:text-ink hover:bg-sky-50 active:scale-95 transition-all"
-              id="r-new">
-              🔄 Periksa Lagi
-            </button>
-            <button type="button"
-              onclick="setTab('chat');setTimeout(()=>document.getElementById('chat-inp').focus(),200)"
-              class="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-md bg-gradient-to-r from-sky to-mint text-white font-extrabold text-sm shadow-[0_4px_18px_rgba(56,189,248,.3)] hover:-translate-y-0.5 active:scale-95 transition-all"
-              id="r-ask">
-              💬 Tanya Asisten
-            </button>
-          </div>
-        </div>
-
-        <!-- Panel: Chat -->
-        <div id="panel-chat" class="hidden">
-          <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-4">
-            <div class="flex flex-col" style="height:380px">
-              <div id="chat-msgs" class="flex-1 overflow-y-auto flex flex-col gap-3 pb-3"></div>
-              <div class="flex gap-2 pt-3 border-t border-slate-100 mt-auto">
-                <input id="chat-inp"
-                  class="flex-1 px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-md text-sm font-semibold text-ink bg-white outline-none focus:border-mint focus:ring-2 focus:ring-mint/15 transition-all placeholder:text-slate-300"
-                  type="text" placeholder="Tanya tentang kondisi anak..." onkeydown="if(event.key==='Enter')doChat()" />
-                <button type="button" onclick="doChat()"
-                  class="w-11 h-11 rounded-md bg-gradient-to-br from-sky to-mint text-white flex items-center justify-center flex-shrink-0 hover:-translate-y-0.5 hover:shadow-lg active:scale-95 transition-all">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div id="quick-qs" class="flex flex-wrap gap-2 mt-3"></div>
-        </div>
-
-      </div><!-- /s-result -->
-
-      <div class="h-10"></div>
     </div>
-  </div><!-- wrapper -->
 
-  <script>
-    // ════════════════════════════════════════
-    // APP STATE
-    // ════════════════════════════════════════
-    const A = { lang: 'id', name: '', age: 5, symptoms: {}, preds: {}, chatHist: [], modelReady: false, demoMode: false };
-
-    // ════════════════════════════════════════
-    // i18n
-    // ════════════════════════════════════════
-    const TT = {
-      id: {
-        pTitle: 'Siapa yang sakit?', pSub: 'Masukkan nama dan umur pasien kecil',
-        nameLbl: 'Nama Anak', ageLbl: 'Umur', years: 'tahun', back: 'Kembali', pBtn: 'Lanjut →',
-        sTit: 'LENGKAPI GEJALA', sHint: 'Isi minimal 3 gejala untuk hasil terbaik',
-        slSev: 'Demam & Durasi', slResp: 'Pernapasan', slGen: 'Kepala & Telinga', slDig: 'Pencernaan & Lainnya',
-        feverLbl: 'Tingkat demam', durLbl: 'Sudah berapa lama',
-        coughLbl: 'Batuk', runnyLbl: 'Pilek', breathLbl: 'Sulit bernapas', throatLbl: 'Sakit tenggorokan',
-        headLbl: 'Sakit kepala', earLbl: 'Sakit telinga', rashLbl: 'Ruam kulit', appeLbl: 'Nafsu makan turun',
-        vomLbl: 'Muntah', diarLbl: 'Diare', mosqLbl: 'Gigitan nyamuk',
-        pick: 'Pilih', yes: 'Ya', no: 'Tidak',
-        tf1: 'Tidak ada demam', tf2: 'Ringan ≤38°C', tf3: 'Tinggi 38–39°C', tf4: 'Sangat tinggi >39°C',
-        td1: 'Sebentar <3 hari', td2: 'Lama ≥3 hari',
-        anaBtn: 'Analisa Sekarang',
-        wSub: 'Ada keluhan apa hari ini?',
-        rTit: 'Hasil Analisa', rSub: 'Berdasarkan gejala yang dilaporkan',
-        tabDiag: 'Diagnosis', tabChat: 'Asisten',
-        disc: '⚠️ <strong>Penting:</strong> Ini bukan diagnosis medis. Segera konsultasikan dengan dokter anak.',
-        symLbl: 'Gejala yang Dilaporkan',
-        rNew: '🔄 Periksa Lagi', rAsk: '💬 Tanya Asisten', rEdit: '✏️ Edit',
-        chatPh: 'Tanya tentang kondisi anak...',
-        vFever: 'Pilih tingkat demam terlebih dahulu.', vSym: 'Pilih minimal 1 gejala.',
-        highest: 'Tertinggi', of_: ' dari ', filled_: ' diisi',
-        gateTitle: 'Model belum dilatih',
-        gateDesc: 'Upload disease_data.csv ke folder server, lalu klik tombol di bawah untuk melatih model Naive Bayes dari 8.000 data.',
-        trainBtn: '🚀 Latih Model Sekarang', trainSkip: 'Lanjut tanpa CSV (demo)',
-        trainOk: '✅ Model berhasil dilatih! Form siap digunakan.',
-        trainErr: '⚠️ Gagal melatih model. Cek apakah disease_data.csv sudah ada di server.',
-      },
-      en: {
-        pTitle: "Who is sick?", pSub: "Enter the child's name and age",
-        nameLbl: 'Child\'s Name', ageLbl: 'Age', years: 'years old', back: 'Back', pBtn: 'Continue →',
-        sTit: 'FILL SYMPTOMS', sHint: 'Fill at least 3 symptoms for best results',
-        slSev: 'Fever & Duration', slResp: 'Respiratory', slGen: 'Head & Ears', slDig: 'Digestive & Other',
-        feverLbl: 'Fever level', durLbl: 'How long',
-        coughLbl: 'Cough', runnyLbl: 'Runny nose', breathLbl: 'Breathing difficulty', throatLbl: 'Sore throat',
-        headLbl: 'Headache', earLbl: 'Ear pain', rashLbl: 'Skin rash', appeLbl: 'Loss of appetite',
-        vomLbl: 'Vomiting', diarLbl: 'Diarrhea', mosqLbl: 'Mosquito bite',
-        pick: 'Select', yes: 'Yes', no: 'No',
-        tf1: 'No fever', tf2: 'Mild ≤38°C', tf3: 'High 38–39°C', tf4: 'Very high >39°C',
-        td1: 'Short <3 days', td2: 'Long ≥3 days',
-        anaBtn: 'Analyze Now',
-        wSub: 'What symptoms today?',
-        rTit: 'Analysis Result', rSub: 'Based on reported symptoms',
-        tabDiag: 'Diagnosis', tabChat: 'Assistant',
-        disc: '⚠️ <strong>Important:</strong> This is not a medical diagnosis. Please consult a pediatrician.',
-        symLbl: 'Reported Symptoms',
-        rNew: '🔄 Check Again', rAsk: '💬 Ask Assistant', rEdit: '✏️ Edit',
-        chatPh: 'Ask about the child\'s condition...',
-        vFever: 'Please select a fever level first.', vSym: 'Select at least 1 symptom.',
-        highest: 'Highest', of_: ' of ', filled_: ' filled',
-        gateTitle: 'Model not trained yet',
-        gateDesc: 'Upload disease_data.csv to the server folder, then click the button below to train the Naive Bayes model.',
-        trainBtn: '🚀 Train Model Now', trainSkip: 'Continue without CSV (demo)',
-        trainOk: '✅ Model trained successfully! Form is ready.',
-        trainErr: '⚠️ Training failed. Check if disease_data.csv exists on the server.',
-      }
-    };
-    const t = k => TT[A.lang]?.[k] ?? k;
-
-    // ════════════════════════════════════════
-    // INIT — check model on page load
-    // ════════════════════════════════════════
-    window.addEventListener('DOMContentLoaded', async () => {
-      // Try to ping api.php to check if model_cache.json exists
-      try {
-        const r = await fetch('api.php?action=status', { signal: AbortSignal.timeout(3000) });
-        if (r.ok) {
-          const d = await r.json();
-          if (d.trained) { A.modelReady = true; return; } // model exists, all good
-        }
-      } catch (e) { /* not on server - demo mode, gate shown after lang select */ }
-      // Show gate after lang is picked (handled in pickLang)
-    });
-
-    // ════════════════════════════════════════
-    // TRAIN GATE
-    // ════════════════════════════════════════
-    function showGate() {
-      const g = document.getElementById('train-gate');
-      g.classList.remove('hidden');
-      document.getElementById('gate-title').textContent = t('gateTitle');
-      document.getElementById('gate-desc').textContent = t('gateDesc');
-      document.getElementById('train-txt').textContent = t('trainBtn').replace('🚀 ', '');
-      document.getElementById('gate-skip').textContent = t('trainSkip');
-      // Lock the form
-      lockForm(true);
-    }
-    function dismissGate() {
-      A.demoMode = true;
-      document.getElementById('train-gate').classList.add('hidden');
-      lockForm(false);
-    }
-    function lockForm(locked) {
-      const form = document.getElementById('sym-form');
-      if (locked) { form.classList.add('form-locked'); document.getElementById('btn-analyze').disabled = true; }
-      else { form.classList.remove('form-locked'); document.getElementById('btn-analyze').disabled = false; }
-    }
-    async function trainModel() {
-      const icon = document.getElementById('train-icon');
-      const txt = document.getElementById('train-txt');
-      const btn = document.getElementById('btn-train');
-      btn.disabled = true;
-      icon.innerHTML = '<span class="inline-block anim-spin">⚙️</span>';
-      txt.textContent = A.lang === 'id' ? 'Melatih...' : 'Training...';
-      try {
-        const r = await fetch('api.php?action=train');
-        const d = await r.json();
-        if (d.success) {
-          A.modelReady = true;
-          document.getElementById('train-gate').innerHTML = `<div class="bg-green-50 border border-green-200 rounded-lg p-4 text-sm font-bold text-green-700">${t('trainOk')} (${d.samples?.toLocaleString() || '?'} data)</div>`;
-          lockForm(false);
-          setTimeout(() => document.getElementById('train-gate').classList.add('hidden'), 4000);
-        } else throw new Error();
-      } catch {
-        btn.disabled = false; icon.textContent = '🚀'; txt.textContent = t('trainBtn').replace('🚀 ', '');
-        const errEl = document.getElementById('train-gate');
-        const notice = document.createElement('p');
-        notice.className = 'text-xs font-bold text-red-600 mt-2';
-        notice.textContent = t('trainErr');
-        errEl.querySelector('.flex')?.appendChild(notice);
-      }
-    }
-
-    // ════════════════════════════════════════
-    // SCREEN NAV
-    // ════════════════════════════════════════
-    function go(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // ════════════════════════════════════════
-    // LANGUAGE
-    // ════════════════════════════════════════
-    function pickLang(l) {
-      A.lang = l;
-      ['id', 'en'].forEach(x => {
-        document.getElementById('lc-' + x).classList.toggle('border-mint', x === l);
-        document.getElementById('lc-' + x).classList.toggle('bg-teal-50', x === l);
-        document.getElementById('ck-' + x).style.opacity = x === l ? '1' : '0';
-      });
-      applyLang();
-      setTimeout(() => {
-        go('s-profile');
-        // Show gate if model not ready
-        if (!A.modelReady && !A.demoMode) showGate();
-      }, 280);
-    }
-    function applyLang() {
-      const set = (id, k) => { const e = document.getElementById(id); if (e) e.textContent = t(k) };
-      const htm = (id, k) => { const e = document.getElementById(id); if (e) e.innerHTML = t(k) };
-      set('p-title', 'pTitle'); set('p-sub', 'pSub'); set('p-name-lbl', 'nameLbl');
-      set('p-age-lbl', 'ageLbl'); set('p-years', 'years'); set('p-back', 'back'); set('p-btn', 'pBtn');
-      set('s-title', 'sTit'); set('s-hint', 'sHint'); set('s-back', 'back');
-      set('sl-sev', 'slSev'); set('sl-resp', 'slResp'); set('sl-gen', 'slGen'); set('sl-dig', 'slDig');
-      set('lbl-fever', 'feverLbl'); set('lbl-dur', 'durLbl'); set('lbl-cough', 'coughLbl');
-      set('lbl-runny', 'runnyLbl'); set('lbl-breath', 'breathLbl'); set('lbl-throat', 'throatLbl');
-      set('lbl-head', 'headLbl'); set('lbl-ear', 'earLbl'); set('lbl-rash', 'rashLbl');
-      set('lbl-appe', 'appeLbl'); set('lbl-vom', 'vomLbl'); set('lbl-diar', 'diarLbl'); set('lbl-mosq', 'mosqLbl');
-      set('ba-txt', 'anaBtn'); set('r-title', 'rTit'); set('r-sub', 'rSub');
-      set('tab-diag-txt', 'tabDiag'); set('tab-chat-txt', 'tabChat');
-      htm('r-disc', 'disc'); set('r-sym-lbl', 'symLbl'); set('r-new', 'rNew'); set('r-ask', 'rAsk'); set('r-edit', 'rEdit');
-      const ci = document.getElementById('chat-inp'); if (ci) ci.placeholder = t('chatPh');
-      document.querySelectorAll('.tf1').forEach(e => e.textContent = t('tf1'));
-      document.querySelectorAll('.tf2').forEach(e => e.textContent = t('tf2'));
-      document.querySelectorAll('.tf3').forEach(e => e.textContent = t('tf3'));
-      document.querySelectorAll('.tf4').forEach(e => e.textContent = t('tf4'));
-      document.querySelectorAll('.td1').forEach(e => e.textContent = t('td1'));
-      document.querySelectorAll('.td2').forEach(e => e.textContent = t('td2'));
-      document.querySelectorAll('.yn-yes').forEach(e => e.textContent = t('yes'));
-      document.querySelectorAll('.yn-no').forEach(e => e.textContent = t('no'));
-      document.querySelectorAll('.dd-lbl').forEach(e => { if (['Pilih', 'Select'].includes(e.textContent.trim())) e.textContent = t('pick') });
-    }
-
-    // ════════════════════════════════════════
-    // AGE STEPPER
-    // ════════════════════════════════════════
-    let _age = 5;
-    function chAge(d) {
-      _age = Math.min(18, Math.max(0, _age + d));
-      document.getElementById('inp-age').textContent = _age;
-      A.age = _age;
-    }
-
-    // ════════════════════════════════════════
-    // PROFILE SUBMIT
-    // ════════════════════════════════════════
-    function submitProfile() {
-      const n = document.getElementById('inp-name').value.trim();
-      const inp = document.getElementById('inp-name');
-      if (!n) { inp.classList.add('border-rose'); inp.focus(); setTimeout(() => inp.classList.remove('border-rose'), 2000); return; }
-      inp.classList.remove('border-rose');
-      A.name = n; A.age = _age;
-      document.getElementById('w-msg').textContent = A.lang === 'id' ? `Halo, ${n}! 👋` : `Hello, ${n}! 👋`;
-      document.getElementById('w-sub').textContent = t('wSub');
-      go('s-sym'); updProg();
-    }
-
-    // ════════════════════════════════════════
-    // DROPDOWN — position:fixed panels, computed from trigger rect
-    // ════════════════════════════════════════
-    let openPanel = null;
-
-    function ddOpen(btn) {
-      const wrap = btn.closest('.dd-wrap');
-      const panel = wrap.querySelector('.dd-panel');
-      const isOpen = panel.classList.contains('open');
-      ddCloseAll();
-      if (isOpen) return;
-
-      // Simple: panel is position:absolute inside .dd-wrap — no JS coords needed.
-      // Only check if we should flip up when near bottom of viewport.
-      const rect = btn.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const panelH = panel.scrollHeight || 120;
-
-      if (spaceBelow < panelH + 16) {
-        panel.classList.add('up');
-      } else {
-        panel.classList.remove('up');
-      }
-
-      panel.classList.add('open');
-      btn.classList.add('border-mint', 'shadow-[0_0_0_3px_rgba(45,212,191,.15)]');
-      const chev = btn.querySelector('.dd-chev');
-      if (chev) { chev.style.transform = 'rotate(180deg)'; chev.classList.add('text-mint'); }
-      openPanel = panel;
-    }
-
-    function ddPick(opt) {
-      const panel = opt.closest('.dd-panel');
-      const wrap = panel.closest('.dd-wrap');
-      const btn = wrap.querySelector('.dd-btn');
-      const key = wrap.dataset.key;
-      const val = opt.dataset.v;
-      // visual select state
-      panel.querySelectorAll('.dd-opt').forEach(o => {
-        o.classList.remove('bg-teal-50', 'text-teal-700', 'font-extrabold');
-        o.querySelector('.dd-dot')?.classList.remove('!bg-mint');
-      });
-      opt.classList.add('bg-teal-50', 'text-teal-700', 'font-extrabold');
-      opt.querySelector('.dd-dot')?.classList.add('!bg-mint');
-      btn.querySelector('.dd-lbl').textContent = opt.querySelector('span:last-child').textContent.trim();
-      A.symptoms[key] = val;
-      ddCloseAll();
-      updProg();
-    }
-
-    function ddCloseAll() {
-      document.querySelectorAll('.dd-panel.open').forEach(p => {
-        p.classList.remove('open', 'up');
-        const btn = p.closest('.dd-wrap')?.querySelector('.dd-btn');
-        if (btn) {
-          btn.classList.remove('border-mint', 'shadow-[0_0_0_3px_rgba(45,212,191,.15)]');
-          const chev = btn.querySelector('.dd-chev');
-          if (chev) { chev.style.transform = ''; chev.classList.remove('text-mint'); }
-        }
-      });
-      openPanel = null;
-    }
-
-    document.addEventListener('click', e => { if (!e.target.closest('.dd-wrap')) ddCloseAll(); }, { passive: true });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') ddCloseAll(); });
-    // Close on scroll
-    window.addEventListener('scroll', ddCloseAll, { passive: true });
-
-    // ════════════════════════════════════════
-    // PROGRESS
-    // ════════════════════════════════════════
-    const SK = ['fever', 'duration', 'cough', 'runny_nose', 'breathing_difficulty', 'sore_throat',
-      'headache', 'ear_pain', 'rash', 'appetite_loss', 'vomiting', 'diarrhea', 'mosquito_bite'];
-    function updProg() {
-      const f = SK.filter(k => A.symptoms[k] !== undefined).length;
-      document.getElementById('prog-bar').style.width = Math.round(f / SK.length * 100) + '%';
-      document.getElementById('prog-txt').textContent = f + t('of_') + SK.length + t('filled_');
-    }
-
-    // ════════════════════════════════════════
-    // NAIVE BAYES FALLBACK
-    // ════════════════════════════════════════
-    function clientPredict(s) {
-      const rules = {
-        'Dengue': { fever: 'high,severe', mosquito_bite: 'Ya', rash: 'Ya', headache: 'Ya', appetite_loss: 'Ya', vomiting: 'Ya' },
-        'Flu': { fever: 'mild,high', cough: 'Ya', runny_nose: 'Ya', sore_throat: 'Ya', headache: 'Ya' },
-        'Pneumonia': { fever: 'high,severe', cough: 'Ya', breathing_difficulty: 'Ya', appetite_loss: 'Ya' },
-        'Malaria': { fever: 'high,severe', mosquito_bite: 'Ya', vomiting: 'Ya', headache: 'Ya' },
-        'Typhoid': { fever: 'high,severe', appetite_loss: 'Ya', vomiting: 'Ya', diarrhea: 'Ya', headache: 'Ya' },
-        'Common Cold': { fever: 'none,mild', runny_nose: 'Ya', cough: 'Ya', sore_throat: 'Ya' },
-        'Otitis': { fever: 'mild,high', ear_pain: 'Ya', headache: 'Ya' },
-      };
-      const sc = {};
-      for (const [d, cr] of Object.entries(rules)) {
-        let m = 0, tot = Object.keys(cr).length;
-        for (const [k, v] of Object.entries(cr)) { if (s[k] && v.split(',').includes(s[k])) m++; }
-        sc[d] = Math.max(3, Math.round(m / tot * 96 + (Math.random() * 4 - 2)));
-      }
-      return Object.fromEntries(Object.entries(sc).sort((a, b) => b[1] - a[1]).slice(0, 4));
-    }
-
-    // ════════════════════════════════════════
-    // ANALYZE
-    // ════════════════════════════════════════
-    async function doAnalyze() {
-      const vm = document.getElementById('v-msg');
-      if (!A.symptoms.fever) { showValidation(t('vFever')); return; }
-      const sf = Object.keys(A.symptoms).filter(k => k !== 'fever' && k !== 'duration').length;
-      if (sf === 0) { showValidation(t('vSym')); return; }
-      vm.classList.add('hidden');
-
-      const btn = document.getElementById('btn-analyze');
-      const icon = document.getElementById('ba-icon');
-      const txtEl = document.getElementById('ba-txt');
-      btn.disabled = true;
-      txtEl.textContent = A.lang === 'id' ? 'Menganalisa...' : 'Analyzing...';
-      icon.innerHTML = '<span class="inline-block anim-spin">⚙️</span>';
-
-      await new Promise(r => setTimeout(r, 750));
-
-      let preds = {};
-      try {
-        const res = await fetch('api.php?action=predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ symptoms: A.symptoms }) });
-        const d = await res.json();
-        preds = d.predictions || clientPredict(A.symptoms);
-      } catch { preds = clientPredict(A.symptoms); }
-
-      A.preds = preds;
-      btn.disabled = false; txtEl.textContent = t('anaBtn'); icon.textContent = '🔍';
-      buildResults(); buildTags(); initChat();
-      go('s-result'); setTab('diag');
-    }
-    function showValidation(msg) {
-      const vm = document.getElementById('v-msg');
-      vm.textContent = msg; vm.classList.remove('hidden');
-      setTimeout(() => vm.classList.add('hidden'), 3500);
-    }
-
-    // ════════════════════════════════════════
-    // DISEASE INFO
-    // ════════════════════════════════════════
-    const DI = {
-      'Dengue': { em: '🦟', b: { id: 'Virus dengue dari gigitan nyamuk Aedes aegypti.', en: 'Dengue virus from Aedes mosquito bite.' }, bar: 'from-rose-400 to-rose-600', bg: 'bg-red-50', pct: 'text-rose-600' },
-      'Flu': { em: '🤧', b: { id: 'Infeksi virus influenza pada saluran pernapasan.', en: 'Influenza virus infection.' }, bar: 'from-blue-400 to-blue-600', bg: 'bg-blue-50', pct: 'text-blue-600' },
-      'Pneumonia': { em: '🫁', b: { id: 'Infeksi paru-paru serius. Perlu dokter segera.', en: 'Serious lung infection. Needs immediate care.' }, bar: 'from-amber-400 to-amber-600', bg: 'bg-amber-50', pct: 'text-amber-600' },
-      'Malaria': { em: '🦟', b: { id: 'Parasit dari nyamuk Anopheles. Perlu tes darah.', en: 'Parasite from Anopheles mosquito.' }, bar: 'from-green-400 to-green-600', bg: 'bg-green-50', pct: 'text-green-600' },
-      'Typhoid': { em: '🦠', b: { id: 'Bakteri Salmonella typhi.', en: 'Salmonella typhi bacteria.' }, bar: 'from-violet-400 to-violet-600', bg: 'bg-violet-50', pct: 'text-violet-600' },
-      'Common Cold': { em: '🤒', b: { id: 'Infeksi virus ringan, sembuh 3–7 hari.', en: 'Mild viral infection.' }, bar: 'from-sky-400 to-sky-600', bg: 'bg-sky-50', pct: 'text-sky-600' },
-      'Otitis': { em: '👂', b: { id: 'Infeksi telinga. Kompres hangat, konsul dokter.', en: 'Ear infection. Warm compress.' }, bar: 'from-orange-400 to-orange-600', bg: 'bg-orange-50', pct: 'text-orange-600' },
-    };
-
-    function buildResults() {
-      const c = document.getElementById('res-items'); c.innerHTML = '';
-      Object.entries(A.preds).forEach(([d, pct], i) => {
-        const info = DI[d] || { em: '🏥', b: { id: 'Perlu evaluasi dokter.', en: 'Needs doctor evaluation.' }, bar: 'from-slate-400 to-slate-600', bg: 'bg-slate-50', pct: 'text-slate-600' };
-        const desc = info.b[A.lang] || info.b.id;
-        const isTop = i === 0;
-        const el = document.createElement('div');
-        el.className = 'py-3.5 ' + (i < Object.keys(A.preds).length - 1 ? 'border-b border-slate-100' : '');
-        el.style.animation = `fadeUp .4s ${i * .1}s ease both`;
-        el.innerHTML = `
-      <div class="flex items-center gap-3 mb-2">
-        <div class="w-10 h-10 rounded-lg ${info.bg} flex items-center justify-center text-xl flex-shrink-0">${info.em}</div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="font-extrabold text-sm text-ink">${d}</span>
-            ${isTop ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-700">✨ ${t('highest')}</span>` : ''}
-          </div>
-          <div class="text-xs text-muted font-semibold mt-0.5">${desc}</div>
-        </div>
-        <div class="font-black text-lg ${info.pct} flex-shrink-0">${pct}%</div>
+    <!-- SCREEN 1: LANGUAGE -->
+    <div id="s-lang" class="screen active">
+      <div class="text-center mb-8 anim-scalein">
+        <div class="inline-block text-6xl mb-3 anim-float">🩺</div>
+        <h1 class="font-baloo font-extrabold grad-text" style="font-size:clamp(2rem,6vw,3rem);line-height:1.1">Dokter Kecil</h1>
+        <p class="text-muted font-bold text-sm mt-2">Asisten kesehatan pintar untuk anak-anak 🌟</p>
       </div>
-      <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-        <div class="h-full bar-fill rounded-full bg-gradient-to-r ${info.bar}" data-w="${pct}"></div>
-      </div>`;
-        c.appendChild(el);
-      });
-      setTimeout(() => c.querySelectorAll('.bar-fill').forEach(b => { b.style.transition = 'width 1.1s cubic-bezier(.4,0,.2,1)'; b.style.width = b.dataset.w + '%'; }), 200);
+      <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 anim-fadeup d1">
+        <p class="text-xs font-black text-muted text-center tracking-widest uppercase mb-4">Pilih Bahasa / Select Language</p>
+        <div class="flex flex-col gap-3">
+          <button id="lc-id" onclick="pickLang('id')" class="lang-card flex items-center gap-4 p-4 rounded-lg border-2 border-slate-200 bg-white text-left cursor-pointer transition-all hover:-translate-y-0.5 hover:border-sky hover:shadow-md active:scale-97">
+            <span class="text-3xl">🇮🇩</span>
+            <div><div class="font-black text-base text-ink">Bahasa Indonesia</div><div class="text-xs text-muted font-semibold">Lanjut dalam bahasa Indonesia</div></div>
+            <span id="ck-id" class="ml-auto text-mint text-xl transition-opacity opacity-0">✓</span>
+          </button>
+          <button id="lc-en" onclick="pickLang('en')" class="lang-card flex items-center gap-4 p-4 rounded-lg border-2 border-slate-200 bg-white text-left cursor-pointer transition-all hover:-translate-y-0.5 hover:border-sky hover:shadow-md active:scale-97">
+            <span class="text-3xl">🇺🇸</span>
+            <div><div class="font-black text-base text-ink">English</div><div class="text-xs text-muted font-semibold">Continue in English</div></div>
+            <span id="ck-en" class="ml-auto text-mint text-xl transition-opacity opacity-0">✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: PROFILE -->
+    <div id="s-profile" class="screen">
+      <div class="flex items-center justify-center gap-0 mb-6">
+        <div id="st1" class="w-8 h-8 rounded-full bg-mint border-2 border-mint text-white flex items-center justify-center text-xs font-black flex-shrink-0">✓</div>
+        <div class="h-0.5 w-9 bg-mint"></div>
+        <div id="st2" class="w-8 h-8 rounded-full border-2 border-sky bg-gradient-to-br from-sky to-mint text-white flex items-center justify-center text-xs font-black flex-shrink-0 shadow-sm">2</div>
+        <div class="h-0.5 w-9 bg-slate-200"></div>
+        <div class="w-8 h-8 rounded-full border-2 border-slate-200 bg-white text-muted flex items-center justify-center text-xs font-black flex-shrink-0">3</div>
+        <div class="h-0.5 w-9 bg-slate-200"></div>
+        <div class="w-8 h-8 rounded-full border-2 border-slate-200 bg-white text-muted flex items-center justify-center text-xs font-black flex-shrink-0">4</div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 sm:p-7">
+        <div class="mb-5"><div class="text-4xl mb-2">👦</div><h2 class="font-baloo font-bold text-xl text-ink" id="p-title">Siapa yang sakit?</h2><p class="text-sm text-muted font-semibold mt-1" id="p-sub">Masukkan nama dan umur pasien kecil</p></div>
+        <div class="mb-4">
+          <label class="block text-xs font-black text-muted tracking-widest uppercase mb-2" id="p-name-lbl">Nama Anak</label>
+          <input id="inp-name" class="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-md font-bold text-sm text-ink bg-white outline-none focus:border-mint focus:ring-2 focus:ring-mint/15 transition-all placeholder:text-slate-300" type="text" placeholder="Contoh: Budi, Sari..." maxlength="40" onkeydown="if(event.key==='Enter')submitProfile()" />
+        </div>
+        <div class="mb-6">
+          <label class="block text-xs font-black text-muted tracking-widest uppercase mb-2" id="p-age-lbl">Umur</label>
+          <div class="flex items-center border-[1.5px] border-slate-200 rounded-md bg-white overflow-hidden">
+            <button type="button" onclick="chAge(-1)" class="flex-shrink-0 w-12 h-12 flex items-center justify-center text-xl font-bold text-muted hover:bg-sky-50 hover:text-sky active:bg-sky-100 transition-colors border-r border-slate-200">−</button>
+            <div class="flex-1 flex items-center justify-center gap-2"><span id="inp-age" class="font-baloo font-extrabold text-2xl text-ink select-none">5</span><span id="p-years" class="text-xs font-bold text-muted">tahun</span></div>
+            <button type="button" onclick="chAge(1)" class="flex-shrink-0 w-12 h-12 flex items-center justify-center text-xl font-bold text-muted hover:bg-sky-50 hover:text-sky active:bg-sky-100 transition-colors border-l border-slate-200">+</button>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <button type="button" onclick="go('s-lang')" class="flex-shrink-0 inline-flex items-center gap-1 px-4 py-3 rounded-md border-[1.5px] border-slate-200 text-muted font-extrabold text-sm hover:border-sky hover:text-ink hover:bg-sky-50 active:scale-95 transition-all">← <span id="p-back">Kembali</span></button>
+          <button type="button" onclick="submitProfile()" class="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-md bg-gradient-to-r from-sky to-mint text-white font-extrabold text-sm shadow-[0_4px_18px_rgba(56,189,248,.3)] hover:-translate-y-0.5 active:scale-95 transition-all"><span id="p-btn">Lanjut →</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: SYMPTOMS -->
+    <div id="s-sym" class="screen">
+      <div class="rounded-xl p-5 mb-5 bg-gradient-to-r from-sky-100 to-teal-50 border border-sky-200 anim-fadeup">
+        <div class="flex items-center gap-3"><span class="text-4xl flex-shrink-0">👋</span><div><div class="font-baloo font-bold text-teal-700 text-lg" id="w-msg">Halo!</div><div class="text-teal-600 text-sm font-semibold opacity-80 mt-0.5" id="w-sub">Ada keluhan apa hari ini?</div></div></div>
+      </div>
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-black text-muted tracking-widest uppercase" id="s-title">LENGKAPI GEJALA</span>
+        <span class="text-xs font-bold text-sky" id="prog-txt">0 dari 13 diisi</span>
+      </div>
+      <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden mb-5"><div id="prog-bar" class="h-full bg-gradient-to-r from-sky to-mint rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div id="sym-form">
+        <!-- Card: Demam & Durasi -->
+        <div class="card-sym bg-white border border-slate-200 rounded-lg shadow-sm p-5 mb-3 anim-fadeup d1 hover:border-slate-300 hover:shadow-md transition-all">
+          <div class="flex items-center gap-2 mb-4"><span class="text-base">🌡️</span><span class="text-xs font-black text-muted tracking-widest uppercase" id="sl-sev">Demam & Durasi</span></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-fever">Tingkat demam</div>
+              <div class="dd-wrap" data-key="fever">
+                <button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl" id="ph-fever">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
+                <div class="dd-panel" data-open="false">
+                  <button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="none" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="tf1">Tidak ada demam</span></button>
+                  <button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="mild" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="tf2">Ringan ≤38°C</span></button>
+                  <button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="high" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="tf3">Tinggi 38–39°C</span></button>
+                  <button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="severe" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="tf4">Sangat tinggi >39°C</span></button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-dur">Sudah berapa lama</div>
+              <div class="dd-wrap" data-key="duration">
+                <button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl" id="ph-dur">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
+                <div class="dd-panel" data-open="false">
+                  <button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="short" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="td1">Sebentar &lt;3 hari</span></button>
+                  <button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="long" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="td2">Lama ≥3 hari</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card: Pernapasan -->
+        <div class="card-sym bg-white border border-slate-200 rounded-lg shadow-sm p-5 mb-3 anim-fadeup d2 hover:border-slate-300 hover:shadow-md transition-all">
+          <div class="flex items-center gap-2 mb-4"><span class="text-base">🤧</span><span class="text-xs font-black text-muted tracking-widest uppercase" id="sl-resp">Pernapasan</span></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-cough">Batuk</div><div class="dd-wrap" data-key="cough"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-runny">Pilek</div><div class="dd-wrap" data-key="runny_nose"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-breath">Sulit bernapas</div><div class="dd-wrap" data-key="breathing_difficulty"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-throat">Sakit tenggorokan</div><div class="dd-wrap" data-key="sore_throat"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+          </div>
+        </div>
+        <!-- Card: Kepala & Telinga -->
+        <div class="card-sym bg-white border border-slate-200 rounded-lg shadow-sm p-5 mb-3 anim-fadeup d3 hover:border-slate-300 hover:shadow-md transition-all">
+          <div class="flex items-center gap-2 mb-4"><span class="text-base">🤕</span><span class="text-xs font-black text-muted tracking-widest uppercase" id="sl-gen">Kepala & Telinga</span></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-head">Sakit kepala</div><div class="dd-wrap" data-key="headache"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-ear">Sakit telinga</div><div class="dd-wrap" data-key="ear_pain"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-rash">Ruam kulit</div><div class="dd-wrap" data-key="rash"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-appe">Nafsu makan turun</div><div class="dd-wrap" data-key="appetite_loss"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+          </div>
+        </div>
+        <!-- Card: Pencernaan & Lainnya -->
+        <div class="card-sym bg-white border border-slate-200 rounded-lg shadow-sm p-5 mb-3 anim-fadeup d4 hover:border-slate-300 hover:shadow-md transition-all">
+          <div class="flex items-center gap-2 mb-4"><span class="text-base">🤢</span><span class="text-xs font-black text-muted tracking-widest uppercase" id="sl-dig">Pencernaan & Lainnya</span></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-vom">Muntah</div><div class="dd-wrap" data-key="vomiting"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-diar">Diare</div><div class="dd-wrap" data-key="diarrhea"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+            <div><div class="text-xs font-extrabold text-slate-400 mb-1.5" id="lbl-mosq">Gigitan nyamuk</div><div class="dd-wrap" data-key="mosquito_bite"><button type="button" class="dd-btn w-full flex items-center justify-between px-3 py-2.5 bg-white border-[1.5px] border-slate-200 rounded-md text-xs font-bold text-ink cursor-pointer transition-all hover:border-sky focus:outline-none" onclick="ddOpen(this)"><span class="dd-lbl">Pilih</span><svg class="dd-chev w-3.5 h-3.5 text-slate-400 flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="dd-panel"><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Tidak" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-no">Tidak</span></button><button type="button" class="dd-opt w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-500 hover:bg-teal-50 hover:text-ink transition-colors" data-v="Ya" onclick="ddPick(this)"><span class="dd-dot w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span><span class="yn-yes">Ya</span></button></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="v-msg" class="hidden mb-3 bg-red-50 border border-red-200 rounded-md px-3.5 py-2.5 text-xs font-bold text-red-600"></div>
+      <div class="flex gap-3 mb-2 anim-fadeup d5">
+        <button type="button" onclick="go('s-profile')" class="flex-shrink-0 inline-flex items-center gap-1 px-4 py-3 rounded-md border-[1.5px] border-slate-200 text-muted font-extrabold text-sm hover:border-sky hover:text-ink hover:bg-sky-50 active:scale-95 transition-all">← <span id="s-back">Kembali</span></button>
+        <button id="btn-analyze" type="button" onclick="doAnalyze()" class="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-md bg-gradient-to-r from-sky to-mint text-white font-extrabold text-sm shadow-[0_4px_18px_rgba(56,189,248,.3)] hover:-translate-y-0.5 active:scale-95 transition-all">
+          <span id="ba-icon">🔍</span><span id="ba-txt">Analisa Sekarang</span>
+        </button>
+      </div>
+      <p class="text-center text-xs text-slate-400 font-semibold" id="s-hint">Isi minimal 3 gejala untuk hasil terbaik</p>
+    </div>
+
+    <!-- SCREEN 4: RESULT -->
+    <div id="s-result" class="screen">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-sky-100 to-teal-100 flex items-center justify-center text-2xl flex-shrink-0">🧠</div>
+        <div><h2 class="font-baloo font-bold text-xl text-ink" id="r-title">Hasil Analisa</h2><p class="text-xs text-muted font-semibold" id="r-sub">Berdasarkan gejala yang dilaporkan</p></div>
+        <button type="button" onclick="go('s-sym')" class="ml-auto flex-shrink-0 px-3 py-2 rounded-md border-[1.5px] border-slate-200 text-muted font-extrabold text-xs hover:border-sky hover:text-ink hover:bg-sky-50 active:scale-95 transition-all" id="r-edit">✏️ Edit</button>
+      </div>
+      <!-- Tabs -->
+      <div class="flex bg-slate-100 rounded-md p-1 gap-1 mb-5">
+        <button type="button" onclick="setTab('diag')" id="tab-diag" class="tab-btn flex-1 py-2 px-3 rounded-md text-xs font-extrabold text-muted bg-white text-ink shadow-sm transition-all">🩺 <span id="tab-diag-txt">Diagnosis</span></button>
+        <button type="button" onclick="setTab('chat')" id="tab-chat" class="tab-btn flex-1 py-2 px-3 rounded-md text-xs font-extrabold text-muted hover:text-ink transition-all">💬 <span id="tab-chat-txt">Asisten</span></button>
+      </div>
+      <!-- Panel: Diagnosis -->
+      <div id="panel-diag">
+        <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-5 mb-3">
+          <div id="res-items"></div>
+          <div class="mt-4 bg-amber-50 border border-amber-200 rounded-md p-3 text-xs font-semibold text-amber-800" id="r-disc">⚠️ <strong>Penting:</strong> Ini bukan diagnosis medis. Segera konsultasikan dengan dokter anak.</div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-4 mb-4">
+          <div class="text-xs font-black text-muted tracking-widest uppercase mb-3" id="r-sym-lbl">Gejala yang Dilaporkan</div>
+          <div id="sym-tags" class="flex flex-wrap gap-1.5"></div>
+        </div>
+        <div class="flex gap-3">
+          <button type="button" onclick="resetAll()" class="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-md border-[1.5px] border-slate-200 text-muted font-extrabold text-sm hover:border-sky hover:text-ink hover:bg-sky-50 active:scale-95 transition-all" id="r-new">🔄 Periksa Lagi</button>
+          <button type="button" onclick="setTab('chat');setTimeout(()=>document.getElementById('chat-inp').focus(),200)" class="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-md bg-gradient-to-r from-sky to-mint text-white font-extrabold text-sm shadow-[0_4px_18px_rgba(56,189,248,.3)] hover:-translate-y-0.5 active:scale-95 transition-all" id="r-ask">💬 Tanya Asisten</button>
+        </div>
+      </div>
+
+      <!-- Panel: Chat ENHANCED -->
+      <div id="panel-chat" class="hidden">
+        <!-- Chat Header -->
+        <div class="bg-white border border-slate-200 rounded-t-xl p-4 flex items-center gap-3 border-b-0">
+          <div class="relative flex-shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-100 to-teal-100 flex items-center justify-center text-xl">🩺</div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 border-2 border-white rounded-full"></div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-extrabold text-sm text-ink">Dokter Kecil AI</div>
+            <div class="status-online"><div class="status-dot"></div><span id="chat-status-txt">Online • Siap membantu</span></div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="chat-msg-count" class="text-xs font-bold text-muted bg-slate-100 px-2 py-1 rounded-full">0 pesan</span>
+            <button onclick="clearChat()" title="Hapus chat" class="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose hover:border-rose transition-all text-sm">🗑</button>
+          </div>
+        </div>
+
+        <!-- Context Bar -->
+        <div id="chat-context-bar" class="bg-gradient-to-r from-sky-50 to-teal-50 border-x border-slate-200 px-4 py-2.5 flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-black text-slate-500 tracking-wide">KONTEKS:</span>
+          <div id="ctx-chips" class="flex gap-1.5 flex-wrap"></div>
+        </div>
+
+        <!-- Topic Tracker -->
+        <div id="topic-tracker" class="bg-white border-x border-slate-200 px-4 py-2 flex items-center gap-2 overflow-x-auto hidden">
+          <span class="text-xs font-bold text-slate-400 flex-shrink-0">Topik:</span>
+          <div id="topic-tags" class="flex gap-1.5"></div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="bg-white border-x border-slate-200" style="height:360px">
+          <div id="chat-msgs" class="h-full overflow-y-auto flex flex-col gap-3 p-4"></div>
+        </div>
+
+        <!-- Typing indicator area -->
+        <div id="typing-area" class="bg-white border-x border-slate-200 px-4 py-1.5 min-h-[28px] hidden">
+          <div class="flex items-center gap-1.5 text-xs text-slate-400 font-semibold">
+            <div class="flex gap-1"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>
+            <span id="typing-txt">Dokter Kecil sedang mengetik...</span>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="bg-white border border-slate-200 rounded-b-xl p-3 border-t border-slate-100">
+          <!-- Quick Replies Row -->
+          <div id="quick-replies-bar" class="flex gap-1.5 mb-2.5 overflow-x-auto pb-1" style="scrollbar-width:none"></div>
+          <!-- Input -->
+          <div class="flex gap-2 items-end">
+            <div class="flex-1 relative">
+              <textarea id="chat-inp" rows="1" class="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-xl text-sm font-semibold text-ink bg-white outline-none focus:border-mint focus:ring-2 focus:ring-mint/15 transition-all placeholder:text-slate-300 resize-none overflow-hidden" placeholder="Tanya tentang kondisi anak..." onkeydown="handleChatKey(event)" oninput="autoResize(this)" style="min-height:42px;max-height:100px"></textarea>
+              <div id="char-count" class="absolute right-2 bottom-2 text-xs text-slate-300 font-bold hidden">0</div>
+            </div>
+            <button type="button" onclick="doChat()" id="send-btn" class="w-11 h-11 rounded-xl bg-gradient-to-br from-sky to-mint text-white flex items-center justify-center flex-shrink-0 hover:-translate-y-0.5 hover:shadow-lg active:scale-95 transition-all disabled:opacity-50">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </button>
+          </div>
+          <div class="flex items-center justify-between mt-1.5">
+            <p class="text-xs text-slate-400 font-semibold">Enter untuk kirim • Shift+Enter baris baru</p>
+            <div id="topic-hint" class="text-xs text-slate-400 font-bold hidden">💡 <span id="topic-hint-txt"></span></div>
+          </div>
+        </div>
+
+        <!-- Suggested Questions Cards (below chat) -->
+        <div id="sugg-area" class="mt-3"></div>
+      </div>
+    </div>
+
+    <div class="h-10"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// APP STATE
+// ════════════════════════════════════════
+const A = {
+  lang: 'id', name: '', age: 5, symptoms: {}, preds: {},
+  chatHist: [], modelReady: false, demoMode: false,
+  msgCount: 0, coveredTopics: new Set(), mood: 'calm',
+  followUpDepth: 0, lastTopic: ''
+};
+
+// ════════════════════════════════════════
+// i18n
+// ════════════════════════════════════════
+const TT = {
+  id: {
+    pTitle:'Siapa yang sakit?', pSub:'Masukkan nama dan umur pasien kecil',
+    nameLbl:'Nama Anak', ageLbl:'Umur', years:'tahun', back:'Kembali', pBtn:'Lanjut →',
+    sTit:'LENGKAPI GEJALA', sHint:'Isi minimal 3 gejala untuk hasil terbaik',
+    slSev:'Demam & Durasi', slResp:'Pernapasan', slGen:'Kepala & Telinga', slDig:'Pencernaan & Lainnya',
+    feverLbl:'Tingkat demam', durLbl:'Sudah berapa lama',
+    coughLbl:'Batuk', runnyLbl:'Pilek', breathLbl:'Sulit bernapas', throatLbl:'Sakit tenggorokan',
+    headLbl:'Sakit kepala', earLbl:'Sakit telinga', rashLbl:'Ruam kulit', appeLbl:'Nafsu makan turun',
+    vomLbl:'Muntah', diarLbl:'Diare', mosqLbl:'Gigitan nyamuk',
+    pick:'Pilih', yes:'Ya', no:'Tidak',
+    tf1:'Tidak ada demam', tf2:'Ringan ≤38°C', tf3:'Tinggi 38–39°C', tf4:'Sangat tinggi >39°C',
+    td1:'Sebentar <3 hari', td2:'Lama ≥3 hari',
+    anaBtn:'Analisa Sekarang', wSub:'Ada keluhan apa hari ini?',
+    rTit:'Hasil Analisa', rSub:'Berdasarkan gejala yang dilaporkan',
+    tabDiag:'Diagnosis', tabChat:'Asisten',
+    disc:'⚠️ <strong>Penting:</strong> Ini bukan diagnosis medis. Segera konsultasikan dengan dokter anak.',
+    symLbl:'Gejala yang Dilaporkan', rNew:'🔄 Periksa Lagi', rAsk:'💬 Tanya Asisten', rEdit:'✏️ Edit',
+    chatPh:'Tanya tentang kondisi anak...',
+    vFever:'Pilih tingkat demam terlebih dahulu.', vSym:'Pilih minimal 1 gejala.',
+    highest:'Tertinggi', of_:' dari ', filled_:' diisi',
+    gateTitle:'Model belum dilatih',
+    gateDesc:'Upload disease_data.csv ke folder server, lalu klik tombol di bawah.',
+    trainBtn:'🚀 Latih Model Sekarang', trainSkip:'Lanjut tanpa CSV (demo)',
+    trainOk:'✅ Model berhasil dilatih!', trainErr:'⚠️ Gagal melatih model.',
+  },
+  en: {
+    pTitle:"Who is sick?", pSub:"Enter the child's name and age",
+    nameLbl:"Child's Name", ageLbl:'Age', years:'years old', back:'Back', pBtn:'Continue →',
+    sTit:'FILL SYMPTOMS', sHint:'Fill at least 3 symptoms for best results',
+    slSev:'Fever & Duration', slResp:'Respiratory', slGen:'Head & Ears', slDig:'Digestive & Other',
+    feverLbl:'Fever level', durLbl:'How long',
+    coughLbl:'Cough', runnyLbl:'Runny nose', breathLbl:'Breathing difficulty', throatLbl:'Sore throat',
+    headLbl:'Headache', earLbl:'Ear pain', rashLbl:'Skin rash', appeLbl:'Loss of appetite',
+    vomLbl:'Vomiting', diarLbl:'Diarrhea', mosqLbl:'Mosquito bite',
+    pick:'Select', yes:'Yes', no:'No',
+    tf1:'No fever', tf2:'Mild ≤38°C', tf3:'High 38–39°C', tf4:'Very high >39°C',
+    td1:'Short <3 days', td2:'Long ≥3 days',
+    anaBtn:'Analyze Now', wSub:'What symptoms today?',
+    rTit:'Analysis Result', rSub:'Based on reported symptoms',
+    tabDiag:'Diagnosis', tabChat:'Assistant',
+    disc:'⚠️ <strong>Important:</strong> This is not a medical diagnosis. Please consult a pediatrician.',
+    symLbl:'Reported Symptoms', rNew:'🔄 Check Again', rAsk:'💬 Ask Assistant', rEdit:'✏️ Edit',
+    chatPh:"Ask about the child's condition...",
+    vFever:'Please select a fever level first.', vSym:'Select at least 1 symptom.',
+    highest:'Highest', of_:' of ', filled_:' filled',
+    gateTitle:'Model not trained yet',
+    gateDesc:'Upload disease_data.csv to the server folder.',
+    trainBtn:'🚀 Train Model Now', trainSkip:'Continue without CSV (demo)',
+    trainOk:'✅ Model trained!', trainErr:'⚠️ Training failed.',
+  }
+};
+const t = k => TT[A.lang]?.[k] ?? k;
+
+// ════════════════════════════════════════
+// RICH SYSTEM PROMPT BUILDER
+// ════════════════════════════════════════
+function buildSystemPrompt() {
+  const top3 = Object.entries(A.preds).slice(0,3).map(([d,p]) => `${d}(${p}%)`).join(', ');
+  const symList = Object.entries(A.symptoms).map(([k,v]) => `${k}:${v}`).join(', ');
+  const coveredStr = [...A.coveredTopics].join(', ') || 'belum ada';
+  const isID = A.lang === 'id';
+
+  if (isID) {
+    return `Kamu adalah Dokter Kecil — asisten kesehatan anak yang hangat, cerdas, dan terpercaya. Kamu seperti dokter anak yang ramah yang berbicara langsung kepada orang tua dengan penuh empati.
+
+PROFIL PASIEN:
+- Nama: ${A.name}
+- Umur: ${A.age} tahun
+- Gejala yang dilaporkan: ${symList}
+- Prediksi top 3: ${top3}
+- Topik yang sudah dibahas: ${coveredStr}
+- Kedalaman percakapan: ${A.followUpDepth} putaran
+
+PANDUAN KARAKTER:
+- Gunakan nama "${A.name}" secara alami dalam respons (tidak di setiap kalimat)
+- Tunjukkan empati nyata, bukan hanya basa-basi
+- Variasikan cara memulai respons (jangan selalu "Tentu saja!" atau "Baik!")
+- Gunakan bahasa sederhana yang dipahami orang tua awam
+- Tambahkan emoji yang relevan secara natural (tidak berlebihan)
+- Sesekali tanyakan follow-up question untuk menggali lebih dalam
+
+GAYA RESPONS BERDASARKAN TOPIK:
+- Untuk pertanyaan medis: berikan jawaban faktual + konteks spesifik untuk ${A.name}
+- Untuk kekhawatiran orang tua: validasi perasaan mereka dulu, baru berikan informasi
+- Untuk pertanyaan obat: selalu tekankan konsultasi dokter, tapi tetap informatif
+- Untuk red flags/darurat: langsung dan tegas, sebutkan tanda bahaya spesifik
+- Untuk nutrisi/aktivitas: praktis dan aplikatif untuk anak usia ${A.age} tahun
+
+FORMAT RESPONS:
+- Panjang: 3-5 kalimat untuk pertanyaan biasa, lebih panjang untuk topik kompleks
+- Jika info banyak, gunakan list pendek (max 4 poin)
+- Akhiri dengan follow-up question yang relevan HANYA jika percakapan masih berlanjut (setiap 2-3 respons)
+- JANGAN akhiri dengan "Apakah ada yang ingin ditanyakan?" terlalu sering — variasikan
+
+BATASAN PENTING:
+- Jangan pernah meresepkan obat spesifik atau dosis
+- Jika gejala serius (breathing difficulty: Ya, atau fever: severe), tambahkan peringatan dokter
+- Kamu bukan pengganti dokter asli — selalu sampaikan ini dengan cara yang tidak menakutkan`;
+  } else {
+    return `You are Dokter Kecil — a warm, intelligent, and trustworthy pediatric health assistant. You speak like a friendly pediatrician talking directly to parents with genuine empathy.
+
+PATIENT PROFILE:
+- Name: ${A.name}
+- Age: ${A.age} years old
+- Reported symptoms: ${symList}
+- Top 3 predictions: ${top3}
+- Topics already covered: ${coveredStr}
+- Conversation depth: ${A.followUpDepth} turns
+
+CHARACTER GUIDELINES:
+- Use "${A.name}'s" naturally in responses (not in every sentence)
+- Show genuine empathy, not just platitudes
+- Vary how you start responses (don't always say "Of course!" or "Sure!")
+- Use language parents without medical backgrounds can understand
+- Add relevant emojis naturally (not excessively)
+- Occasionally ask a follow-up question to dig deeper
+
+RESPONSE STYLE BY TOPIC:
+- Medical questions: factual answer + context specific to ${A.name}
+- Parental concerns: validate feelings first, then provide information
+- Medication questions: always emphasize doctor consultation, but stay informative
+- Red flags/emergencies: be direct and clear about specific warning signs
+- Nutrition/activity: practical and relevant for a ${A.age}-year-old
+
+RESPONSE FORMAT:
+- Length: 3-5 sentences for regular questions, longer for complex topics
+- For lots of info, use short lists (max 4 points)
+- End with a follow-up question only when conversation is still going (every 2-3 responses)
+- DON'T end with "Is there anything else?" too often — vary it
+
+IMPORTANT LIMITS:
+- Never prescribe specific medications or dosages
+- If severe symptoms (breathing_difficulty: Ya, fever: severe), add urgent doctor warning
+- You're not a replacement for a real doctor — convey this in a non-alarming way`;
+  }
+}
+
+// ════════════════════════════════════════
+// TOPIC DETECTION
+// ════════════════════════════════════════
+const TOPIC_MAP_ID = {
+  'dokter|konsultasi|kapan ke': { key: 'kapan_dokter', label: '🏥 Kapan ke Dokter', color: 'bg-rose-100 text-rose-700 border-rose-200' },
+  'obat|minum obat|parasetamol|ibuprofen': { key: 'obat', label: '💊 Obat-obatan', color: 'bg-purple-100 text-purple-700 border-purple-200' },
+  'makan|minum|nutrisi|cairan|makanan': { key: 'nutrisi', label: '🥗 Nutrisi & Cairan', color: 'bg-green-100 text-green-700 border-green-200' },
+  'istirahat|tidur|aktivitas|olahraga|sekolah': { key: 'aktivitas', label: '😴 Aktivitas & Istirahat', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+  'bahaya|darurat|parah|memburuk|gawat': { key: 'darurat', label: '🚨 Tanda Bahaya', color: 'bg-red-100 text-red-700 border-red-200' },
+  'apa itu|pengertian|penyebab|kenapa': { key: 'penyakit', label: '🔬 Info Penyakit', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  'sembuh|pulih|berapa lama|prognosis': { key: 'prognosis', label: '⏱ Prognosis', color: 'bg-teal-100 text-teal-700 border-teal-200' },
+  'menular|penularan|kontak|saudara': { key: 'penularan', label: '🦠 Penularan', color: 'bg-orange-100 text-orange-700 border-orange-200' },
+  'demam|panas|suhu': { key: 'demam', label: '🌡️ Demam', color: 'bg-red-100 text-red-600 border-red-200' },
+  'kompres|mandi|lap|fisik': { key: 'perawatan', label: '🩹 Perawatan Fisik', color: 'bg-sky-100 text-sky-700 border-sky-200' },
+};
+
+const TOPIC_MAP_EN = {
+  'doctor|hospital|when to see|emergency': { key: 'when_doctor', label: '🏥 When to See Doctor', color: 'bg-rose-100 text-rose-700 border-rose-200' },
+  'medicine|medication|paracetamol|ibuprofen|drug': { key: 'medication', label: '💊 Medications', color: 'bg-purple-100 text-purple-700 border-purple-200' },
+  'eat|drink|food|fluid|nutrition|diet': { key: 'nutrition', label: '🥗 Nutrition & Fluids', color: 'bg-green-100 text-green-700 border-green-200' },
+  'rest|sleep|school|activity|exercise': { key: 'activity', label: '😴 Activity & Rest', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+  'danger|emergency|serious|worse|critical': { key: 'emergency', label: '🚨 Warning Signs', color: 'bg-red-100 text-red-700 border-red-200' },
+  'what is|cause|why|definition': { key: 'disease_info', label: '🔬 Disease Info', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  'recover|heal|how long|prognosis': { key: 'prognosis', label: '⏱ Recovery', color: 'bg-teal-100 text-teal-700 border-teal-200' },
+  'contagious|spread|contact|siblings': { key: 'contagion', label: '🦠 Contagion', color: 'bg-orange-100 text-orange-700 border-orange-200' },
+  'fever|temperature|heat': { key: 'fever', label: '🌡️ Fever', color: 'bg-red-100 text-red-600 border-red-200' },
+  'compress|bath|wipe|physical': { key: 'care', label: '🩹 Physical Care', color: 'bg-sky-100 text-sky-700 border-sky-200' },
+};
+
+function detectTopic(text) {
+  const map = A.lang === 'id' ? TOPIC_MAP_ID : TOPIC_MAP_EN;
+  const lower = text.toLowerCase();
+  for (const [pattern, info] of Object.entries(map)) {
+    if (new RegExp(pattern).test(lower)) return info;
+  }
+  return null;
+}
+
+function updateTopicTracker(text) {
+  const topic = detectTopic(text);
+  if (!topic) return;
+  A.coveredTopics.add(topic.key);
+  A.lastTopic = topic.key;
+  const tracker = document.getElementById('topic-tracker');
+  const tags = document.getElementById('topic-tags');
+  tracker.classList.remove('hidden');
+  if (!tags.querySelector(`[data-topic="${topic.key}"]`)) {
+    const el = document.createElement('span');
+    el.setAttribute('data-topic', topic.key);
+    el.className = `topic-badge border ${topic.color} flex-shrink-0 anim-bouncein`;
+    el.textContent = topic.label;
+    tags.appendChild(el);
+  }
+  // Show topic hint
+  updateTopicHint(topic);
+}
+
+function updateTopicHint(topic) {
+  const hints_id = {
+    'kapan_dokter': 'Tanyakan juga tanda darurat spesifik',
+    'obat': 'Selalu konsultasi dokter untuk dosis',
+    'nutrisi': 'Cairan sangat penting untuk pemulihan',
+    'darurat': 'Pergi ke IGD jika gejala memburuk tiba-tiba',
+    'prognosis': 'Istirahat cukup mempercepat pemulihan',
+  };
+  const hints_en = {
+    'when_doctor': 'Also ask about specific warning signs',
+    'medication': 'Always consult a doctor for dosage',
+    'nutrition': 'Fluids are critical for recovery',
+    'emergency': 'Go to ER if symptoms worsen suddenly',
+    'prognosis': 'Adequate rest speeds recovery',
+  };
+  const hints = A.lang === 'id' ? hints_id : hints_en;
+  const hint = hints[topic.key];
+  if (hint) {
+    const hintEl = document.getElementById('topic-hint');
+    const hintTxt = document.getElementById('topic-hint-txt');
+    hintTxt.textContent = hint;
+    hintEl.classList.remove('hidden');
+    setTimeout(() => hintEl.classList.add('hidden'), 5000);
+  }
+}
+
+// ════════════════════════════════════════
+// DYNAMIC QUICK REPLIES (context-aware)
+// ════════════════════════════════════════
+const QR_POOLS_ID = {
+  initial: [
+    `Apa itu ${() => Object.keys(A.preds)[0] || 'penyakit ini'}?`,
+    'Kapan harus ke dokter?',
+    'Cara merawat di rumah?',
+    'Apakah menular?',
+    'Berapa lama sembuhnya?',
+    'Makanan yang dianjurkan?',
+  ],
+  after_disease: ['Apa penyebabnya?', 'Apakah bisa komplikasi?', 'Bagaimana pencegahannya?', 'Apakah perlu tes darah?'],
+  after_food: ['Boleh minum susu?', 'Buah apa yang bagus?', 'Berapa banyak minum air?', 'Boleh jajan dulu?'],
+  after_doctor: ['Tes apa yang diperlukan?', 'Butuh rawat inap?', 'Dokter spesialis apa?', 'Bawa ke puskesmas atau RS?'],
+  after_medicine: ['Efek sampingnya apa?', 'Berapa lama minum obat?', 'Boleh dicampur obat lain?'],
+  fever_specific: ['Kapan demam dianggap berbahaya?', 'Cara kompres yang benar?', 'Boleh mandi saat demam?', 'Berikan obat demam berapa jam sekali?'],
+  general: ['Ada yang perlu saya khawatirkan?', 'Apa tanda-tanda membaik?', 'Kapan bisa sekolah lagi?', 'Perlu isolasi dari adik/kakak?'],
+};
+
+const QR_POOLS_EN = {
+  initial: [
+    `What is ${() => Object.keys(A.preds)[0] || 'this disease'}?`,
+    'When to see a doctor?',
+    'Home care tips?',
+    'Is it contagious?',
+    'How long to recover?',
+    'Recommended foods?',
+  ],
+  after_disease: ["What's the cause?", 'Can it cause complications?', 'How to prevent it?', 'Need blood test?'],
+  after_food: ['Can they drink milk?', 'Best fruits?', 'How much water?', 'Avoid any foods?'],
+  after_doctor: ['What tests are needed?', 'Need hospitalization?', 'Which specialist?'],
+  after_medicine: ['Any side effects?', 'How long to take medication?'],
+  fever_specific: ['When is fever dangerous?', 'How to do a compress?', 'Bath during fever?', 'How often to give fever medicine?'],
+  general: ['Anything to worry about?', 'Signs of improvement?', 'When can they go back to school?', 'Isolate from siblings?'],
+};
+
+function getContextualReplies() {
+  const pool = A.lang === 'id' ? QR_POOLS_ID : QR_POOLS_EN;
+  let replies = [...pool.initial.map(r => typeof r === 'function' ? r() : r)];
+
+  // Add context-aware based on covered topics
+  if (A.coveredTopics.has('penyakit') || A.coveredTopics.has('disease_info')) {
+    replies = [...pool.after_disease, ...pool.general];
+  } else if (A.coveredTopics.has('nutrisi') || A.coveredTopics.has('nutrition')) {
+    replies = [...pool.after_food, ...pool.general];
+  } else if (A.coveredTopics.has('kapan_dokter') || A.coveredTopics.has('when_doctor')) {
+    replies = [...pool.after_doctor, ...pool.general];
+  } else if (A.coveredTopics.has('obat') || A.coveredTopics.has('medication')) {
+    replies = [...pool.after_medicine, ...pool.general];
+  } else if (A.coveredTopics.has('demam') || A.coveredTopics.has('fever') || A.symptoms.fever === 'high' || A.symptoms.fever === 'severe') {
+    replies = [...pool.fever_specific, ...pool.general];
+  }
+
+  // Shuffle and limit
+  return replies.sort(() => Math.random() - 0.5).slice(0, 4);
+}
+
+function renderQuickReplies() {
+  const bar = document.getElementById('quick-replies-bar');
+  bar.innerHTML = '';
+  getContextualReplies().forEach(q => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'quick-reply flex-shrink-0 anim-bouncein';
+    b.textContent = q;
+    b.onclick = () => { document.getElementById('chat-inp').value = q; doChat(); };
+    bar.appendChild(b);
+  });
+}
+
+// ════════════════════════════════════════
+// SUGGESTED QUESTION CARDS
+// ════════════════════════════════════════
+function renderSuggCards() {
+  const area = document.getElementById('sugg-area');
+  const top = Object.keys(A.preds)[0] || 'kondisi ini';
+  const isID = A.lang === 'id';
+
+  const cards = isID ? [
+    { em: '🌡️', title: 'Tentang Demam', q: `Bagaimana cara menangani demam ${A.symptoms.fever === 'severe' ? 'tinggi' : ''} pada anak usia ${A.age} tahun?` },
+    { em: '💊', title: 'Pengobatan', q: `Obat apa yang aman untuk ${top} pada anak ${A.age} tahun?` },
+    { em: '🥗', title: 'Nutrisi & Diet', q: `Makanan dan minuman apa yang bagus selama ${A.name} sakit ${top}?` },
+    { em: '🚨', title: 'Tanda Bahaya', q: `Apa tanda-tanda bahaya yang harus membuat saya segera bawa ${A.name} ke dokter?` },
+  ] : [
+    { em: '🌡️', title: 'About Fever', q: `How to manage fever in a ${A.age}-year-old child with ${top}?` },
+    { em: '💊', title: 'Treatment', q: `What medications are safe for ${top} in a ${A.age}-year-old?` },
+    { em: '🥗', title: 'Nutrition', q: `What foods and drinks are good while ${A.name} has ${top}?` },
+    { em: '🚨', title: 'Warning Signs', q: `What danger signs should make me take ${A.name} to the doctor immediately?` },
+  ];
+
+  area.innerHTML = `<p class="text-xs font-black text-muted tracking-widest uppercase mb-2">${isID ? 'PERTANYAAN YANG SERING DITANYA' : 'FREQUENTLY ASKED QUESTIONS'}</p>
+  <div class="grid grid-cols-2 gap-2">
+    ${cards.map(c => `
+      <button type="button" class="sugg-card text-left" onclick="document.getElementById('chat-inp').value=${JSON.stringify(c.q)};setTab('chat');doChat()">
+        <div class="text-lg mb-1">${c.em}</div>
+        <div class="font-extrabold text-xs text-ink">${c.title}</div>
+        <div class="text-xs text-muted font-semibold mt-0.5 line-clamp-2">${c.q}</div>
+      </button>
+    `).join('')}
+  </div>`;
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const r = await fetch('api.php?action=status', { signal: AbortSignal.timeout(3000) });
+    if (r.ok) { const d = await r.json(); if (d.trained) { A.modelReady = true; return; } }
+  } catch (e) {}
+});
+
+// ════════════════════════════════════════
+// TRAIN GATE
+// ════════════════════════════════════════
+function showGate() {
+  const g = document.getElementById('train-gate');
+  g.classList.remove('hidden');
+  document.getElementById('gate-title').textContent = t('gateTitle');
+  document.getElementById('gate-desc').textContent = t('gateDesc');
+  document.getElementById('train-txt').textContent = t('trainBtn').replace('🚀 ','');
+  document.getElementById('gate-skip').textContent = t('trainSkip');
+  lockForm(true);
+}
+function dismissGate() { A.demoMode = true; document.getElementById('train-gate').classList.add('hidden'); lockForm(false); }
+function lockForm(locked) {
+  const form = document.getElementById('sym-form');
+  if (locked) { form.classList.add('form-locked'); document.getElementById('btn-analyze').disabled = true; }
+  else { form.classList.remove('form-locked'); document.getElementById('btn-analyze').disabled = false; }
+}
+async function trainModel() {
+  const icon = document.getElementById('train-icon'), txt = document.getElementById('train-txt'), btn = document.getElementById('btn-train');
+  btn.disabled = true; icon.innerHTML = '<span class="inline-block anim-spin">⚙️</span>';
+  txt.textContent = A.lang === 'id' ? 'Melatih...' : 'Training...';
+  try {
+    const r = await fetch('api.php?action=train'); const d = await r.json();
+    if (d.success) { A.modelReady = true; document.getElementById('train-gate').innerHTML = `<div class="bg-green-50 border border-green-200 rounded-lg p-4 text-sm font-bold text-green-700">${t('trainOk')}</div>`; lockForm(false); setTimeout(() => document.getElementById('train-gate').classList.add('hidden'), 4000); }
+    else throw new Error();
+  } catch { btn.disabled = false; icon.textContent = '🚀'; txt.textContent = t('trainBtn').replace('🚀 ',''); }
+}
+
+// ════════════════════════════════════════
+// SCREEN NAV
+// ════════════════════════════════════════
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ════════════════════════════════════════
+// LANGUAGE
+// ════════════════════════════════════════
+function pickLang(l) {
+  A.lang = l;
+  ['id','en'].forEach(x => {
+    document.getElementById('lc-'+x).classList.toggle('border-mint', x===l);
+    document.getElementById('lc-'+x).classList.toggle('bg-teal-50', x===l);
+    document.getElementById('ck-'+x).style.opacity = x===l ? '1' : '0';
+  });
+  applyLang();
+  setTimeout(() => { go('s-profile'); if (!A.modelReady && !A.demoMode) showGate(); }, 280);
+}
+
+function applyLang() {
+  const set = (id,k) => { const e=document.getElementById(id); if(e) e.textContent=t(k) };
+  const htm = (id,k) => { const e=document.getElementById(id); if(e) e.innerHTML=t(k) };
+  set('p-title','pTitle'); set('p-sub','pSub'); set('p-name-lbl','nameLbl');
+  set('p-age-lbl','ageLbl'); set('p-years','years'); set('p-back','back'); set('p-btn','pBtn');
+  set('s-title','sTit'); set('s-hint','sHint'); set('s-back','back');
+  set('sl-sev','slSev'); set('sl-resp','slResp'); set('sl-gen','slGen'); set('sl-dig','slDig');
+  set('lbl-fever','feverLbl'); set('lbl-dur','durLbl'); set('lbl-cough','coughLbl');
+  set('lbl-runny','runnyLbl'); set('lbl-breath','breathLbl'); set('lbl-throat','throatLbl');
+  set('lbl-head','headLbl'); set('lbl-ear','earLbl'); set('lbl-rash','rashLbl');
+  set('lbl-appe','appeLbl'); set('lbl-vom','vomLbl'); set('lbl-diar','diarLbl'); set('lbl-mosq','mosqLbl');
+  set('ba-txt','anaBtn'); set('r-title','rTit'); set('r-sub','rSub');
+  set('tab-diag-txt','tabDiag'); set('tab-chat-txt','tabChat');
+  htm('r-disc','disc'); set('r-sym-lbl','symLbl'); set('r-new','rNew'); set('r-ask','rAsk'); set('r-edit','rEdit');
+  const ci = document.getElementById('chat-inp'); if(ci) ci.placeholder = t('chatPh');
+  document.querySelectorAll('.tf1').forEach(e=>e.textContent=t('tf1'));
+  document.querySelectorAll('.tf2').forEach(e=>e.textContent=t('tf2'));
+  document.querySelectorAll('.tf3').forEach(e=>e.textContent=t('tf3'));
+  document.querySelectorAll('.tf4').forEach(e=>e.textContent=t('tf4'));
+  document.querySelectorAll('.td1').forEach(e=>e.textContent=t('td1'));
+  document.querySelectorAll('.td2').forEach(e=>e.textContent=t('td2'));
+  document.querySelectorAll('.yn-yes').forEach(e=>e.textContent=t('yes'));
+  document.querySelectorAll('.yn-no').forEach(e=>e.textContent=t('no'));
+  document.querySelectorAll('.dd-lbl').forEach(e=>{ if(['Pilih','Select'].includes(e.textContent.trim())) e.textContent=t('pick') });
+}
+
+// ════════════════════════════════════════
+// AGE STEPPER
+// ════════════════════════════════════════
+let _age = 5;
+function chAge(d) {
+  _age = Math.min(18, Math.max(0, _age + d));
+  document.getElementById('inp-age').textContent = _age;
+  A.age = _age;
+}
+
+// ════════════════════════════════════════
+// PROFILE SUBMIT
+// ════════════════════════════════════════
+function submitProfile() {
+  const n = document.getElementById('inp-name').value.trim();
+  const inp = document.getElementById('inp-name');
+  if (!n) { inp.classList.add('border-rose'); inp.focus(); setTimeout(() => inp.classList.remove('border-rose'), 2000); return; }
+  inp.classList.remove('border-rose');
+  A.name = n; A.age = _age;
+  document.getElementById('w-msg').textContent = A.lang==='id' ? `Halo, ${n}! 👋` : `Hello, ${n}! 👋`;
+  document.getElementById('w-sub').textContent = t('wSub');
+  go('s-sym'); updProg();
+}
+
+// ════════════════════════════════════════
+// DROPDOWNS
+// ════════════════════════════════════════
+let openPanel = null;
+function ddOpen(btn) {
+  const wrap = btn.closest('.dd-wrap'), panel = wrap.querySelector('.dd-panel');
+  const isOpen = panel.classList.contains('open');
+  ddCloseAll();
+  if (isOpen) return;
+  const rect = btn.getBoundingClientRect(), spaceBelow = window.innerHeight - rect.bottom;
+  if (spaceBelow < (panel.scrollHeight || 120) + 16) panel.classList.add('up'); else panel.classList.remove('up');
+  panel.classList.add('open');
+  btn.classList.add('border-mint','shadow-[0_0_0_3px_rgba(45,212,191,.15)]');
+  const chev = btn.querySelector('.dd-chev');
+  if (chev) { chev.style.transform = 'rotate(180deg)'; chev.classList.add('text-mint'); }
+  openPanel = panel;
+}
+function ddPick(opt) {
+  const panel = opt.closest('.dd-panel'), wrap = panel.closest('.dd-wrap'), btn = wrap.querySelector('.dd-btn');
+  const key = wrap.dataset.key, val = opt.dataset.v;
+  panel.querySelectorAll('.dd-opt').forEach(o => { o.classList.remove('bg-teal-50','text-teal-700','font-extrabold'); o.querySelector('.dd-dot')?.classList.remove('!bg-mint'); });
+  opt.classList.add('bg-teal-50','text-teal-700','font-extrabold');
+  opt.querySelector('.dd-dot')?.classList.add('!bg-mint');
+  btn.querySelector('.dd-lbl').textContent = opt.querySelector('span:last-child').textContent.trim();
+  A.symptoms[key] = val;
+  ddCloseAll(); updProg();
+}
+function ddCloseAll() {
+  document.querySelectorAll('.dd-panel.open').forEach(p => {
+    p.classList.remove('open','up');
+    const btn = p.closest('.dd-wrap')?.querySelector('.dd-btn');
+    if (btn) { btn.classList.remove('border-mint','shadow-[0_0_0_3px_rgba(45,212,191,.15)]'); const chev = btn.querySelector('.dd-chev'); if(chev){ chev.style.transform=''; chev.classList.remove('text-mint'); } }
+  });
+  openPanel = null;
+}
+document.addEventListener('click', e => { if(!e.target.closest('.dd-wrap')) ddCloseAll(); }, {passive:true});
+document.addEventListener('keydown', e => { if(e.key==='Escape') ddCloseAll(); });
+window.addEventListener('scroll', ddCloseAll, {passive:true});
+
+// ════════════════════════════════════════
+// PROGRESS
+// ════════════════════════════════════════
+const SK = ['fever','duration','cough','runny_nose','breathing_difficulty','sore_throat','headache','ear_pain','rash','appetite_loss','vomiting','diarrhea','mosquito_bite'];
+function updProg() {
+  const f = SK.filter(k => A.symptoms[k] !== undefined).length;
+  document.getElementById('prog-bar').style.width = Math.round(f/SK.length*100)+'%';
+  document.getElementById('prog-txt').textContent = f+t('of_')+SK.length+t('filled_');
+}
+
+// ════════════════════════════════════════
+// NAIVE BAYES FALLBACK
+// ════════════════════════════════════════
+function clientPredict(s) {
+  const rules = {
+    'Dengue': {fever:'high,severe', mosquito_bite:'Ya', rash:'Ya', headache:'Ya', appetite_loss:'Ya', vomiting:'Ya'},
+    'Flu': {fever:'mild,high', cough:'Ya', runny_nose:'Ya', sore_throat:'Ya', headache:'Ya'},
+    'Pneumonia': {fever:'high,severe', cough:'Ya', breathing_difficulty:'Ya', appetite_loss:'Ya'},
+    'Malaria': {fever:'high,severe', mosquito_bite:'Ya', vomiting:'Ya', headache:'Ya'},
+    'Typhoid': {fever:'high,severe', appetite_loss:'Ya', vomiting:'Ya', diarrhea:'Ya', headache:'Ya'},
+    'Common Cold': {fever:'none,mild', runny_nose:'Ya', cough:'Ya', sore_throat:'Ya'},
+    'Otitis': {fever:'mild,high', ear_pain:'Ya', headache:'Ya'},
+  };
+  const sc = {};
+  for (const [d,cr] of Object.entries(rules)) {
+    let m=0, tot=Object.keys(cr).length;
+    for (const [k,v] of Object.entries(cr)) { if(s[k] && v.split(',').includes(s[k])) m++; }
+    sc[d] = Math.max(3, Math.round(m/tot*96+(Math.random()*4-2)));
+  }
+  return Object.fromEntries(Object.entries(sc).sort((a,b)=>b[1]-a[1]).slice(0,4));
+}
+
+// ════════════════════════════════════════
+// ANALYZE
+// ════════════════════════════════════════
+async function doAnalyze() {
+  const vm = document.getElementById('v-msg');
+  if (!A.symptoms.fever) { showValidation(t('vFever')); return; }
+  const sf = Object.keys(A.symptoms).filter(k=>k!=='fever'&&k!=='duration').length;
+  if (sf===0) { showValidation(t('vSym')); return; }
+  vm.classList.add('hidden');
+  const btn = document.getElementById('btn-analyze'), icon = document.getElementById('ba-icon'), txtEl = document.getElementById('ba-txt');
+  btn.disabled=true; txtEl.textContent=A.lang==='id'?'Menganalisa...':'Analyzing...';
+  icon.innerHTML='<span class="inline-block anim-spin">⚙️</span>';
+  await new Promise(r=>setTimeout(r,750));
+  let preds = {};
+  try {
+    const res = await fetch('api.php?action=predict', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({symptoms:A.symptoms})});
+    const d = await res.json();
+    preds = d.predictions || clientPredict(A.symptoms);
+  } catch { preds = clientPredict(A.symptoms); }
+  A.preds = preds;
+  btn.disabled=false; txtEl.textContent=t('anaBtn'); icon.textContent='🔍';
+  buildResults(); buildTags(); initChat();
+  go('s-result'); setTab('diag');
+}
+function showValidation(msg) {
+  const vm = document.getElementById('v-msg');
+  vm.textContent=msg; vm.classList.remove('hidden');
+  setTimeout(()=>vm.classList.add('hidden'),3500);
+}
+
+// ════════════════════════════════════════
+// DISEASE INFO
+// ════════════════════════════════════════
+const DI = {
+  'Dengue': {em:'🦟', b:{id:'Virus dengue dari gigitan nyamuk Aedes aegypti.',en:'Dengue virus from Aedes mosquito bite.'}, bar:'from-rose-400 to-rose-600', bg:'bg-red-50', pct:'text-rose-600'},
+  'Flu': {em:'🤧', b:{id:'Infeksi virus influenza pada saluran pernapasan.',en:'Influenza virus infection.'}, bar:'from-blue-400 to-blue-600', bg:'bg-blue-50', pct:'text-blue-600'},
+  'Pneumonia': {em:'🫁', b:{id:'Infeksi paru-paru serius. Perlu dokter segera.',en:'Serious lung infection. Needs immediate care.'}, bar:'from-amber-400 to-amber-600', bg:'bg-amber-50', pct:'text-amber-600'},
+  'Malaria': {em:'🦟', b:{id:'Parasit dari nyamuk Anopheles. Perlu tes darah.',en:'Parasite from Anopheles mosquito.'}, bar:'from-green-400 to-green-600', bg:'bg-green-50', pct:'text-green-600'},
+  'Typhoid': {em:'🦠', b:{id:'Bakteri Salmonella typhi.',en:'Salmonella typhi bacteria.'}, bar:'from-violet-400 to-violet-600', bg:'bg-violet-50', pct:'text-violet-600'},
+  'Common Cold': {em:'🤒', b:{id:'Infeksi virus ringan, sembuh 3–7 hari.',en:'Mild viral infection.'}, bar:'from-sky-400 to-sky-600', bg:'bg-sky-50', pct:'text-sky-600'},
+  'Otitis': {em:'👂', b:{id:'Infeksi telinga. Kompres hangat, konsul dokter.',en:'Ear infection. Warm compress.'}, bar:'from-orange-400 to-orange-600', bg:'bg-orange-50', pct:'text-orange-600'},
+};
+
+function buildResults() {
+  const c = document.getElementById('res-items'); c.innerHTML='';
+  Object.entries(A.preds).forEach(([d,pct],i) => {
+    const info = DI[d]||{em:'🏥',b:{id:'Perlu evaluasi dokter.',en:'Needs doctor evaluation.'},bar:'from-slate-400 to-slate-600',bg:'bg-slate-50',pct:'text-slate-600'};
+    const desc = info.b[A.lang]||info.b.id;
+    const isTop = i===0;
+    const el = document.createElement('div');
+    el.className='py-3.5 '+(i<Object.keys(A.preds).length-1?'border-b border-slate-100':'');
+    el.style.animation=`fadeUp .4s ${i*.1}s ease both`;
+    el.innerHTML=`<div class="flex items-center gap-3 mb-2"><div class="w-10 h-10 rounded-lg ${info.bg} flex items-center justify-center text-xl flex-shrink-0">${info.em}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><span class="font-extrabold text-sm text-ink">${d}</span>${isTop?`<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-700">✨ ${t('highest')}</span>`:''}</div><div class="text-xs text-muted font-semibold mt-0.5">${desc}</div></div><div class="font-black text-lg ${info.pct} flex-shrink-0">${pct}%</div></div><div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bar-fill rounded-full bg-gradient-to-r ${info.bar}" data-w="${pct}"></div></div>`;
+    c.appendChild(el);
+  });
+  setTimeout(()=>c.querySelectorAll('.bar-fill').forEach(b=>{b.style.transition='width 1.1s cubic-bezier(.4,0,.2,1)';b.style.width=b.dataset.w+'%';}),200);
+}
+
+function buildTags() {
+  const c = document.getElementById('sym-tags'); c.innerHTML='';
+  const nm = {id:{fever:'Demam',duration:'Durasi',cough:'Batuk',runny_nose:'Pilek',breathing_difficulty:'Sesak napas',sore_throat:'Sakit tenggorokan',headache:'Sakit kepala',ear_pain:'Sakit telinga',rash:'Ruam',appetite_loss:'Tdk nafsu makan',vomiting:'Muntah',diarrhea:'Diare',mosquito_bite:'Gigitan nyamuk'},en:{fever:'Fever',duration:'Duration',cough:'Cough',runny_nose:'Runny nose',breathing_difficulty:'Dyspnea',sore_throat:'Sore throat',headache:'Headache',ear_pain:'Ear pain',rash:'Rash',appetite_loss:'No appetite',vomiting:'Vomiting',diarrhea:'Diarrhea',mosquito_bite:'Mosquito bite'}};
+  const names = nm[A.lang];
+  for (const [k,v] of Object.entries(A.symptoms)) {
+    if (!v) continue;
+    const pos = v==='Ya'||v==='Yes'||['high','severe','mild','long'].includes(v);
+    const s = document.createElement('span');
+    s.className='inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold '+(pos?'bg-amber-100 text-amber-700':'bg-blue-100 text-blue-600');
+    s.textContent=(names[k]||k)+': '+(v==='Ya'?t('yes'):v==='Tidak'?t('no'):v);
+    c.appendChild(s);
+  }
+}
+
+// ════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════
+function setTab(tab) {
+  document.getElementById('panel-diag').classList.toggle('hidden', tab!=='diag');
+  document.getElementById('panel-chat').classList.toggle('hidden', tab!=='chat');
+  const diag=document.getElementById('tab-diag'), chat=document.getElementById('tab-chat');
+  if (tab==='diag') {
+    diag.classList.add('bg-white','text-ink','shadow-sm'); diag.classList.remove('text-muted');
+    chat.classList.remove('bg-white','shadow-sm'); chat.classList.add('text-muted');
+  } else {
+    chat.classList.add('bg-white','text-ink','shadow-sm'); chat.classList.remove('text-muted');
+    diag.classList.remove('bg-white','shadow-sm'); diag.classList.add('text-muted');
+    setTimeout(()=>{ const m=document.getElementById('chat-msgs'); m.scrollTop=m.scrollHeight; },80);
+  }
+}
+
+// ════════════════════════════════════════
+// CHAT INIT
+// ════════════════════════════════════════
+function initChat() {
+  A.chatHist = []; A.msgCount = 0; A.coveredTopics = new Set(); A.followUpDepth = 0; A.lastTopic = '';
+  const m = document.getElementById('chat-msgs'); m.innerHTML='';
+  document.getElementById('topic-tracker').classList.add('hidden');
+  document.getElementById('topic-tags').innerHTML='';
+  updateMsgCount();
+  buildContextChips();
+
+  const top = Object.keys(A.preds)[0] || (A.lang==='id'?'penyakit':'disease');
+  const pct = A.preds[top] || 0;
+  const isID = A.lang==='id';
+  const hasSevere = A.symptoms.fever==='severe' || A.symptoms.breathing_difficulty==='Ya';
+
+  // Greeting message - varied
+  const greetings = isID ? [
+    `Halo! Saya **Dokter Kecil** 🩺 Saya sudah melihat gejala **${A.name}** ya.\n\nBerdasarkan analisa, kemungkinan utamanya adalah **${top}** dengan keyakinan sekitar **${pct}%**. ${hasSevere?'⚠️ Ada beberapa gejala yang perlu diperhatikan lebih serius.':''}\n\nBoleh tanya apa saja tentang kondisi ${A.name} — saya siap membantu! 😊`,
+    `Halo, Bunda/Ayah! 👋 Saya **Dokter Kecil**, asisten kesehatan anak.\n\nSudah saya review semua gejala **${A.name}** (${A.age} tahun). Kemungkinan terbesar menunjukkan ke arah **${top}** (${pct}%). ${hasSevere?'\n\n⚠️ Karena ada gejala yang cukup serius, saya sarankan segera konsultasi ke dokter.':''}\n\nAda yang ingin Anda ketahui lebih lanjut? 🌟`,
+  ] : [
+    `Hello! I'm **Dokter Kecil** 🩺 I've reviewed **${A.name}**'s symptoms.\n\nBased on the analysis, the most likely finding is **${top}** with about **${pct}%** confidence. ${hasSevere?'⚠️ Some symptoms need closer attention.':''}\n\nFeel free to ask anything about ${A.name}'s condition! 😊`,
+    `Hi there! 👋 I'm **Dokter Kecil**, your pediatric health assistant.\n\nI've gone through all of **${A.name}**'s symptoms (age ${A.age}). The analysis points most strongly toward **${top}** (${pct}%). ${hasSevere?'\n\n⚠️ Given the severity of some symptoms, I recommend seeing a doctor soon.':''}\n\nWhat would you like to know? 🌟`,
+  ];
+
+  botMsg(greetings[Math.floor(Math.random()*greetings.length)]);
+
+  // If urgent, add warning card
+  if (hasSevere) {
+    setTimeout(() => botMsgWarning(isID
+      ? `⚠️ **Perhatian Khusus:** Gejala ${A.name} (${A.symptoms.breathing_difficulty==='Ya'?'sesak napas':'demam sangat tinggi'}) memerlukan penanganan dokter segera. Jangan tunda ke dokter!`
+      : `⚠️ **Special Notice:** ${A.name}'s symptoms (${A.symptoms.breathing_difficulty==='Ya'?'breathing difficulty':'very high fever'}) need immediate medical attention. Don't delay seeing a doctor!`
+    ), 800);
+  }
+
+  renderQuickReplies();
+  setTimeout(() => renderSuggCards(), 300);
+}
+
+function buildContextChips() {
+  const chips = document.getElementById('ctx-chips');
+  chips.innerHTML = '';
+  const items = [
+    { em: '👶', label: `${A.name}, ${A.age} ${t('years')}` },
+    { em: '🌡️', label: A.lang==='id'?{none:'Tdk demam',mild:'Demam ringan',high:'Demam tinggi',severe:'Demam sangat tinggi'}[A.symptoms.fever]||'?':{none:'No fever',mild:'Mild fever',high:'High fever',severe:'Very high fever'}[A.symptoms.fever]||'?' },
+    { em: '🩺', label: `${Object.keys(A.preds)[0]||'?'} (${Object.values(A.preds)[0]||0}%)` },
+  ];
+  items.forEach(i => {
+    const el = document.createElement('div');
+    el.className = 'ctx-chip';
+    el.innerHTML = `${i.em} ${i.label}`;
+    chips.appendChild(el);
+  });
+}
+
+// ════════════════════════════════════════
+// MESSAGE RENDERERS
+// ════════════════════════════════════════
+function getTime() {
+  const now = new Date();
+  return now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+}
+
+function botMsg(txt) {
+  const m = document.getElementById('chat-msgs');
+  const w = document.createElement('div');
+  w.className = 'flex items-end gap-2 anim-slider';
+  const formatted = txt.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  w.innerHTML = `
+    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-100 to-teal-100 flex items-center justify-center text-sm flex-shrink-0 flex-shrink-0">🩺</div>
+    <div class="flex-1 max-w-[82%]">
+      <div class="chat-bubble-bot px-3.5 py-2.5 text-ink text-sm font-semibold leading-relaxed">${formatted}</div>
+      <div class="msg-time mt-1 ml-1">${getTime()}</div>
+    </div>`;
+  m.appendChild(w);
+  m.scrollTop = m.scrollHeight;
+}
+
+function botMsgWarning(txt) {
+  const m = document.getElementById('chat-msgs');
+  const w = document.createElement('div');
+  w.className = 'anim-slider';
+  const formatted = txt.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  w.innerHTML = `
+    <div class="chat-bubble-warning px-4 py-3 text-sm font-semibold leading-relaxed">${formatted}</div>
+    <div class="msg-time mt-1 ml-1">${getTime()}</div>`;
+  m.appendChild(w);
+  m.scrollTop = m.scrollHeight;
+}
+
+function botMsgCard(title, items) {
+  const m = document.getElementById('chat-msgs');
+  const w = document.createElement('div');
+  w.className = 'flex items-end gap-2 anim-slider';
+  w.innerHTML = `
+    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-100 to-teal-100 flex items-center justify-center text-sm flex-shrink-0">🩺</div>
+    <div class="flex-1 max-w-[82%]">
+      <div class="know-card overflow-hidden">
+        <div class="know-card-header">${title}</div>
+        <div class="p-3">
+          ${items.map(i=>`<div class="flex items-start gap-2 py-1.5 border-b border-sky-100 last:border-0"><span class="text-sm flex-shrink-0">${i.em}</span><span class="text-xs font-semibold text-slate-700">${i.text}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="msg-time mt-1 ml-1">${getTime()}</div>
+    </div>`;
+  m.appendChild(w);
+  m.scrollTop = m.scrollHeight;
+}
+
+function userMsg(txt) {
+  const m = document.getElementById('chat-msgs');
+  const w = document.createElement('div');
+  w.className = 'flex items-end gap-2 flex-row-reverse anim-slidel';
+  w.innerHTML = `
+    <div class="flex-1 max-w-[82%] text-right">
+      <div class="chat-bubble-user px-3.5 py-2.5 text-sm font-semibold leading-relaxed inline-block text-left">${txt}</div>
+      <div class="msg-time mt-1 mr-1 text-right">${getTime()}</div>
+    </div>`;
+  m.appendChild(w);
+  m.scrollTop = m.scrollHeight;
+}
+
+function showTyping() {
+  const area = document.getElementById('typing-area');
+  const txt = document.getElementById('typing-txt');
+  txt.textContent = A.lang==='id' ? 'Dokter Kecil sedang mengetik...' : 'Dokter Kecil is typing...';
+  area.classList.remove('hidden');
+  document.getElementById('chat-msgs').scrollTop = document.getElementById('chat-msgs').scrollHeight;
+}
+
+function hideTyping() {
+  document.getElementById('typing-area').classList.add('hidden');
+}
+
+function updateMsgCount() {
+  const el = document.getElementById('chat-msg-count');
+  const isID = A.lang === 'id';
+  el.textContent = `${A.msgCount} ${isID ? 'pesan' : 'messages'}`;
+}
+
+// ════════════════════════════════════════
+// AUTO RESIZE TEXTAREA
+// ════════════════════════════════════════
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+function handleChatKey(e) {
+  if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); doChat(); }
+}
+
+// ════════════════════════════════════════
+// MAIN CHAT FUNCTION
+// ════════════════════════════════════════
+async function doChat() {
+  const inp = document.getElementById('chat-inp');
+  const q = inp.value.trim(); if (!q) return;
+  inp.value=''; inp.style.height='auto';
+
+  userMsg(q);
+  A.chatHist.push({role:'user', content:q});
+  A.msgCount++;
+  updateTopicTracker(q);
+  updateMsgCount();
+
+  showTyping();
+  document.getElementById('quick-replies-bar').innerHTML = '';
+
+  const sys = buildSystemPrompt();
+
+  try {
+    // Simulate variable typing delay for realism
+    const delay = 600 + Math.random() * 800;
+    await new Promise(r => setTimeout(r, delay));
+
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: sys,
+        messages: A.chatHist.slice(-12) // keep longer context
+      })
+    });
+    const d = await r.json();
+    const reply = d.content?.map(c=>c.text||'').join('') || fallback(q);
+
+    hideTyping();
+    A.followUpDepth++;
+
+    // Detect if we should show a card format
+    if (shouldShowCard(q)) {
+      renderSmartCard(q, reply);
+    } else {
+      botMsg(reply);
     }
 
-    function buildTags() {
-      const c = document.getElementById('sym-tags'); c.innerHTML = '';
-      const nm = { id: { fever: 'Demam', duration: 'Durasi', cough: 'Batuk', runny_nose: 'Pilek', breathing_difficulty: 'Sesak napas', sore_throat: 'Sakit tenggorokan', headache: 'Sakit kepala', ear_pain: 'Sakit telinga', rash: 'Ruam', appetite_loss: 'Tdk nafsu makan', vomiting: 'Muntah', diarrhea: 'Diare', mosquito_bite: 'Gigitan nyamuk' }, en: { fever: 'Fever', duration: 'Duration', cough: 'Cough', runny_nose: 'Runny nose', breathing_difficulty: 'Dyspnea', sore_throat: 'Sore throat', headache: 'Headache', ear_pain: 'Ear pain', rash: 'Rash', appetite_loss: 'No appetite', vomiting: 'Vomiting', diarrhea: 'Diarrhea', mosquito_bite: 'Mosquito bite' } };
-      const names = nm[A.lang];
-      for (const [k, v] of Object.entries(A.symptoms)) {
-        if (!v) continue;
-        const pos = v === 'Ya' || v === 'Yes' || ['high', 'severe', 'mild', 'long'].includes(v);
-        const s = document.createElement('span');
-        s.className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ' + (pos ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-600');
-        s.textContent = (names[k] || k) + ': ' + (v === 'Ya' ? t('yes') : v === 'Tidak' ? t('no') : v);
-        c.appendChild(s);
-      }
-    }
+    A.chatHist.push({role:'assistant', content:reply});
+    A.msgCount++;
+    updateMsgCount();
 
-    // ════════════════════════════════════════
-    // TABS
-    // ════════════════════════════════════════
-    function setTab(tab) {
-      document.getElementById('panel-diag').classList.toggle('hidden', tab !== 'diag');
-      document.getElementById('panel-chat').classList.toggle('hidden', tab !== 'chat');
-      const diag = document.getElementById('tab-diag');
-      const chat = document.getElementById('tab-chat');
-      if (tab === 'diag') {
-        diag.classList.add('bg-white', 'text-ink', 'shadow-sm'); diag.classList.remove('text-muted');
-        chat.classList.remove('bg-white', 'shadow-sm'); chat.classList.add('text-muted');
-      } else {
-        chat.classList.add('bg-white', 'text-ink', 'shadow-sm'); chat.classList.remove('text-muted');
-        diag.classList.remove('bg-white', 'shadow-sm'); diag.classList.add('text-muted');
-        setTimeout(() => { const m = document.getElementById('chat-msgs'); m.scrollTop = m.scrollHeight; }, 80);
-      }
-    }
+    // Update quick replies based on new context
+    setTimeout(renderQuickReplies, 200);
 
-    // ════════════════════════════════════════
-    // CHAT
-    // ════════════════════════════════════════
-    function initChat() {
-      A.chatHist = [];
-      const m = document.getElementById('chat-msgs'); m.innerHTML = '';
-      const top = Object.keys(A.preds)[0] || 'penyakit';
-      const g = A.lang === 'id'
-        ? `Halo! Saya Dokter Kecil 🩺\n\nBerdasarkan gejala **${A.name}** (${A.age} tahun), kemungkinan utama adalah **${top}**.\n\nAda yang ingin ditanyakan? 😊`
-        : `Hello! I'm Dokter Kecil 🩺\n\nBased on **${A.name}**'s symptoms (age ${A.age}), the top finding is **${top}**.\n\nAny questions? 😊`;
-      botMsg(g); buildQQ();
-    }
-    function buildQQ() {
-      const c = document.getElementById('quick-qs'); c.innerHTML = '';
-      const qs = A.lang === 'id'
-        ? ['Apa itu ' + (Object.keys(A.preds)[0] || 'penyakit') + '?', 'Kapan harus ke dokter?', 'Cara merawat di rumah?', 'Makanan yang dianjurkan?']
-        : ['What is ' + (Object.keys(A.preds)[0] || 'disease') + '?', 'When to see a doctor?', 'Home care tips?', 'Recommended foods?'];
-      qs.forEach(q => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'px-3 py-1.5 rounded-md border border-slate-200 text-xs font-bold text-muted hover:border-sky hover:text-ink hover:bg-sky-50 active:scale-95 transition-all';
-        b.textContent = q;
-        b.onclick = () => { document.getElementById('chat-inp').value = q; doChat(); };
-        c.appendChild(b);
-      });
-    }
-    function botMsg(txt) {
-      const m = document.getElementById('chat-msgs');
-      const w = document.createElement('div');
-      w.className = 'flex items-end gap-2 anim-slider';
-      w.innerHTML = `<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-100 to-teal-100 flex items-center justify-center text-sm flex-shrink-0">🩺</div><div class="max-w-[80%] px-3.5 py-2.5 rounded-2xl rounded-bl bg-white border border-slate-200 text-ink text-sm font-semibold leading-relaxed">${txt.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>`;
-      m.appendChild(w); m.scrollTop = m.scrollHeight;
-    }
-    function userMsg(txt) {
-      const m = document.getElementById('chat-msgs');
-      const w = document.createElement('div');
-      w.className = 'flex items-end gap-2 flex-row-reverse anim-slidel';
-      w.innerHTML = `<div class="max-w-[80%] px-3.5 py-2.5 rounded-2xl rounded-br bg-gradient-to-r from-sky to-mint text-white text-sm font-semibold leading-relaxed">${txt}</div>`;
-      m.appendChild(w); m.scrollTop = m.scrollHeight;
-    }
-    function typingInd() {
-      const m = document.getElementById('chat-msgs');
-      const w = document.createElement('div');
-      w.id = 'typing'; w.className = 'flex items-end gap-2';
-      w.innerHTML = `<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-100 to-teal-100 flex items-center justify-center text-sm flex-shrink-0">🩺</div><div class="px-4 py-3 rounded-2xl rounded-bl bg-white border border-slate-200 flex gap-1.5 items-center"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
-      m.appendChild(w); m.scrollTop = m.scrollHeight;
-      return w;
-    }
-    async function doChat() {
-      const inp = document.getElementById('chat-inp');
-      const q = inp.value.trim(); if (!q) return;
-      inp.value = ''; userMsg(q); A.chatHist.push({ role: 'user', content: q });
-      const ti = typingInd();
-      const top3 = Object.entries(A.preds).slice(0, 3).map(([d, p]) => `${d}(${p}%)`).join(', ');
-      const symList = Object.entries(A.symptoms).map(([k, v]) => `${k}:${v}`).join(', ');
-      const sys = A.lang === 'id'
-        ? `Kamu adalah Dokter Kecil, asisten kesehatan anak yang ramah dan terpercaya. Pasien: ${A.name}, umur ${A.age} tahun. Gejala: ${symList}. Prediksi top: ${top3}. Jawab dalam Bahasa Indonesia, singkat (2-4 kalimat), hangat dan mudah dipahami orang tua. Jangan menggantikan dokter asli.`
-        : `You are Dokter Kecil, a friendly pediatric health assistant. Patient: ${A.name}, age ${A.age}. Symptoms: ${symList}. Top predictions: ${top3}. Answer in English, concise (2-4 sentences), warm and parent-friendly. Never replace a real doctor.`;
-      try {
-        const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: sys, messages: A.chatHist.slice(-8) }) });
-        const d = await r.json();
-        const reply = d.content?.map(c => c.text || '').join('') || fallback(q);
-        ti.remove(); botMsg(reply); A.chatHist.push({ role: 'assistant', content: reply });
-      } catch { ti.remove(); const fb = fallback(q); botMsg(fb); A.chatHist.push({ role: 'assistant', content: fb }); }
-    }
-    function fallback(q) {
-      const top = Object.keys(A.preds)[0] || 'kondisi ini';
-      const l = A.lang, ql = q.toLowerCase();
-      if (ql.includes('dokter') || ql.includes('doctor') || ql.includes('kapan') || ql.includes('when'))
-        return l === 'id' ? `Bawa ${A.name} ke dokter jika demam tidak turun dalam 3 hari, kondisi memburuk, atau ada sesak napas. 🏥` : `Take ${A.name} to a doctor if fever persists 3+ days or breathing difficulty occurs. 🏥`;
-      if (ql.includes('makan') || ql.includes('food'))
-        return l === 'id' ? `Berikan sup hangat, buah-buahan, dan banyak cairan. Hindari makanan berminyak. 🥣` : `Give warm soup, fruits, and plenty of fluids. Avoid oily foods. 🥣`;
-      if (ql.includes('obat') || ql.includes('medicine'))
-        return l === 'id' ? `Untuk ${top}, konsultasikan dulu dengan dokter sebelum memberikan obat apapun. 💊` : `For ${top}, always consult a doctor before giving any medication. 💊`;
-      return l === 'id'
-        ? `Berdasarkan gejala ${A.name}, ${top} perlu dikonfirmasi dokter untuk penanganan tepat. 💙`
-        : `Based on ${A.name}'s symptoms, ${top} needs doctor confirmation for proper treatment. 💙`;
-    }
+    // Update status
+    const status = document.getElementById('chat-status-txt');
+    const topics = A.coveredTopics.size;
+    status.textContent = A.lang==='id'
+      ? `${topics} topik dibahas • ${A.msgCount} pesan`
+      : `${topics} topics covered • ${A.msgCount} messages`;
 
-    // ════════════════════════════════════════
-    // RESET
-    // ════════════════════════════════════════
-    function resetAll() {
-      A.symptoms = {}; A.preds = {}; A.chatHist = [];
-      document.querySelectorAll('.dd-lbl').forEach(e => e.textContent = t('pick'));
-      document.querySelectorAll('.dd-opt').forEach(o => o.classList.remove('bg-teal-50', 'text-teal-700', 'font-extrabold'));
-      document.querySelectorAll('.dd-dot').forEach(d => d.classList.remove('!bg-mint'));
-      document.getElementById('prog-bar').style.width = '0%';
-      document.getElementById('prog-txt').textContent = '0' + t('of_') + SK.length + t('filled_');
-      go('s-sym');
+  } catch(e) {
+    hideTyping();
+    const fb = fallback(q);
+    botMsg(fb);
+    A.chatHist.push({role:'assistant', content:fb});
+    A.msgCount++;
+    updateMsgCount();
+    setTimeout(renderQuickReplies, 200);
+  }
+}
+
+function shouldShowCard(q) {
+  const ql = q.toLowerCase();
+  const isID = A.lang === 'id';
+  const cardTriggers = isID
+    ? ['tanda bahaya', 'red flag', 'darurat', 'kapan ke dokter', 'langkah', 'cara merawat', 'tips', 'apa saja', 'makanan apa', 'buah apa']
+    : ['warning signs', 'danger', 'emergency', 'when to see', 'steps', 'how to care', 'tips', 'what foods', 'what fruits'];
+  return cardTriggers.some(t => ql.includes(t));
+}
+
+function renderSmartCard(q, reply) {
+  // Parse the reply into card items if it contains list-like content
+  const lines = reply.split('\n').filter(l => l.trim());
+  const hasListItems = lines.some(l => l.match(/^[\-\*\•\d]/) || l.includes('•'));
+
+  if (hasListItems && lines.length > 3) {
+    const title = A.lang==='id' ? `🩺 Informasi untuk ${A.name}` : `🩺 Info for ${A.name}`;
+    const emojis = ['✅','⚠️','💡','🔹','📌','🌟','🏥','💊','🥗','⏰'];
+    const items = lines
+      .filter(l => l.trim().length > 5)
+      .slice(0, 6)
+      .map((l, i) => ({
+        em: emojis[i % emojis.length],
+        text: l.replace(/^[\-\*\•\d\.]+\s*/, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      }));
+    botMsgCard(title, items);
+  } else {
+    botMsg(reply);
+  }
+}
+
+// ════════════════════════════════════════
+// FALLBACK RESPONSES (rich variety)
+// ════════════════════════════════════════
+function fallback(q) {
+  const top = Object.keys(A.preds)[0] || (A.lang==='id' ? 'kondisi ini' : 'this condition');
+  const l = A.lang, ql = q.toLowerCase();
+  const n = A.name;
+  const age = A.age;
+
+  if (A.lang === 'id') {
+    if (ql.match(/dokter|kapan|harus ke|ke rs|ke puskesmas/)) {
+      const variants = [
+        `Bawa ${n} ke dokter segera jika: demam tidak turun setelah 3 hari minum obat, kondisi ${n} tiba-tiba memburuk, muncul sesak napas, atau ada tanda dehidrasi (mulut kering, tidak mau minum). 🏥`,
+        `Sebaiknya konsultasi dokter jika demam ${n} berlangsung lebih dari 72 jam, atau jika ${n} terlihat sangat lemas dan tidak responsif. Jangan tunggu kondisi memburuk ya! 🩺`,
+        `Untuk ${top}, penanganan dokter diperlukan jika gejala tidak membaik dalam 2-3 hari atau justru makin parah. Dokter anak adalah pilihan terbaik untuk ${n}. 💙`,
+      ];
+      return variants[Math.floor(Math.random()*variants.length)];
     }
-  </script>
+    if (ql.match(/makan|minum|makanan|nutrisi|buah|cairan/)) {
+      return `Selama ${n} sakit, perbanyak cairan seperti air putih, oralit, atau sup hangat. Untuk anak usia ${age} tahun, tawarkan makan dalam porsi kecil tapi sering — nasi tim, bubur, pisang, atau apel bisa jadi pilihan baik. Hindari makanan berminyak atau terlalu manis dulu. 🥗`;
+    }
+    if (ql.match(/obat|parasetamol|ibuprofen|demam turun|penurun panas/)) {
+      return `Untuk menurunkan demam ${n}, parasetamol adalah pilihan umum yang aman. Namun dosis harus disesuaikan berat badan — selalu baca petunjuk atau konsultasi apoteker/dokter terlebih dulu. Jangan berikan aspirin pada anak ya! 💊`;
+    }
+    if (ql.match(/menular|penularan|kontak|adik|kakak|saudara/)) {
+      const isContagious = ['Flu','Common Cold'].includes(top);
+      return isContagious
+        ? `${top} memang cukup mudah menular melalui droplet (percikan air liur). Sebaiknya ${n} pakai masker di sekitar anggota keluarga lain, cuci tangan sering, dan hindari berbagi alat makan. Isolasi ringan selama 3-5 hari pertama disarankan. 🦠`
+        : `${top} umumnya tidak menular langsung antar orang. Tetap terapkan kebersihan standar seperti cuci tangan dan tidak berbagi alat makan untuk jaga-jaga ya. 😊`;
+    }
+    if (ql.match(/berapa lama|sembuh|pulih|prognosis|kapan sehat/)) {
+      return `Untuk ${top}, anak usia ${age} tahun biasanya butuh waktu 5-14 hari untuk pulih dengan perawatan yang baik. Yang paling penting adalah istirahat cukup, minum banyak cairan, dan makan bergizi. Kalau dalam 3 hari tidak ada perbaikan, segera ke dokter ya! ⏱`;
+    }
+    if (ql.match(/kompres|mandi|lap panas|fisik/)) {
+      return `Kompres hangat (bukan dingin!) di dahi ${n} bisa membantu meredakan demam sementara. Gunakan air hangat sekitar 30-35°C, lakukan selama 10-15 menit. Boleh mandi air hangat, tapi jangan terlalu lama. Pastikan ${n} tetap berpakaian ringan ya. 🩹`;
+    }
+    if (ql.match(/tidur|istirahat|sekolah|aktivitas|bermain/)) {
+      return `${n} sebaiknya istirahat di rumah dulu sampai demam benar-benar turun dan kondisi membaik. Untuk anak ${age} tahun, istirahat minimal 9-10 jam malam plus 1-2 jam siang sangat membantu pemulihan. Boleh sekolah lagi setelah bebas demam minimal 24 jam tanpa obat. 😴`;
+    }
+    // Generic with variety
+    const generic = [
+      `Berdasarkan gejala ${n}, ${top} memerlukan perhatian dan perawatan yang tepat. Ada pertanyaan lebih spesifik tentang kondisi ini? 💙`,
+      `Tenang ya, kondisi ${n} bisa tertangani dengan baik jika dirawat dengan benar. Untuk info lebih detail tentang ${top}, silakan tanya hal yang lebih spesifik! 🌟`,
+      `Saya paham kekhawatiran Anda tentang ${n}. Untuk ${top}, yang terpenting adalah monitor gejala dan konsultasi dokter jika ada perubahan. Ada yang ingin ditanyakan lebih lanjut? 😊`,
+    ];
+    return generic[Math.floor(Math.random()*generic.length)];
+  } else {
+    // English fallbacks
+    if (ql.match(/doctor|hospital|when to see|emergency/)) {
+      return `Take ${n} to see a doctor if: fever doesn't go down after 3 days of medication, condition suddenly worsens, breathing difficulty appears, or signs of dehydration occur (dry mouth, refusing fluids). 🏥`;
+    }
+    if (ql.match(/food|drink|eat|fluid|nutrition/)) {
+      return `While ${n} is sick, offer plenty of fluids — water, electrolyte drinks, or warm soup. For a ${age}-year-old, small frequent meals work best: rice porridge, bananas, toast, or apples are gentle on the stomach. Avoid greasy or very sweet foods for now. 🥗`;
+    }
+    if (ql.match(/medicine|medication|fever|temperature/)) {
+      return `For ${n}'s fever, paracetamol is generally safe and commonly used in children. However, the dose must be based on body weight — always check the label or ask a pharmacist/doctor first. Never give aspirin to children! 💊`;
+    }
+    if (ql.match(/contagious|spread|siblings|contact/)) {
+      const isContagious = ['Flu','Common Cold'].includes(top);
+      return isContagious
+        ? `${top} is quite contagious through respiratory droplets. It's best to have ${n} wear a mask around family members, wash hands frequently, and avoid sharing utensils. Light isolation for the first 3-5 days is recommended. 🦠`
+        : `${top} is generally not directly contagious between people. Still maintain basic hygiene like handwashing and not sharing utensils to be safe. 😊`;
+    }
+    if (ql.match(/how long|recover|heal|prognosis/)) {
+      return `For ${top}, a ${age}-year-old usually needs about 5-14 days to fully recover with proper care. The key is adequate rest, plenty of fluids, and good nutrition. If there's no improvement within 3 days, see a doctor! ⏱`;
+    }
+    const generic = [
+      `Based on ${n}'s symptoms, ${top} needs proper attention and care. Any more specific questions about this condition? 💙`,
+      `Don't worry — ${n}'s condition can be well-managed with the right care. For more details on ${top}, feel free to ask something more specific! 🌟`,
+    ];
+    return generic[Math.floor(Math.random()*generic.length)];
+  }
+}
+
+// ════════════════════════════════════════
+// CLEAR CHAT
+// ════════════════════════════════════════
+function clearChat() {
+  const isID = A.lang === 'id';
+  if (!confirm(isID ? 'Hapus semua riwayat chat?' : 'Clear all chat history?')) return;
+  A.chatHist = []; A.msgCount = 0; A.coveredTopics = new Set(); A.followUpDepth = 0;
+  document.getElementById('chat-msgs').innerHTML = '';
+  document.getElementById('topic-tracker').classList.add('hidden');
+  document.getElementById('topic-tags').innerHTML = '';
+  updateMsgCount();
+  const status = document.getElementById('chat-status-txt');
+  status.textContent = isID ? 'Online • Siap membantu' : 'Online • Ready to help';
+  botMsg(isID ? `Chat baru dimulai! 👋 Saya siap menjawab pertanyaan tentang kondisi **${A.name}** lagi.` : `Fresh start! 👋 Ready to answer questions about **${A.name}**'s condition again.`);
+  renderQuickReplies();
+}
+
+// ════════════════════════════════════════
+// RESET
+// ════════════════════════════════════════
+function resetAll() {
+  A.symptoms={}; A.preds={}; A.chatHist=[]; A.msgCount=0; A.coveredTopics=new Set(); A.followUpDepth=0;
+  document.querySelectorAll('.dd-lbl').forEach(e=>e.textContent=t('pick'));
+  document.querySelectorAll('.dd-opt').forEach(o=>o.classList.remove('bg-teal-50','text-teal-700','font-extrabold'));
+  document.querySelectorAll('.dd-dot').forEach(d=>d.classList.remove('!bg-mint'));
+  document.getElementById('prog-bar').style.width='0%';
+  document.getElementById('prog-txt').textContent='0'+t('of_')+SK.length+t('filled_');
+  go('s-sym');
+}
+</script>
 </body>
-
 </html>
